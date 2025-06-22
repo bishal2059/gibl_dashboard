@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global IME Bank - Enhanced Revenue Prediction System</title>
+    <link rel="stylesheet" href="src/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body data-theme="light">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="screen active">
+        <div class="loading-container">
+            <div class="bank-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h1>Global IME Bank</h1>
+                <p>Enhanced Revenue Prediction System</p>
+            </div>
+            <div class="loading-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="loading-text" id="loadingText">Initializing System...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h1>Global IME Bank</h1>
+                <p>Enhanced Revenue Prediction Portal</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input type="text" id="username" class="form-control" required>
+                    <div class="error-message" id="usernameError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" class="form-control" required>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="rememberMe">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                </div>
+                <button type="submit" class="btn btn--primary btn--full-width">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </form>
+            <div class="login-footer">
+                <p>Secure Banking Analytics Platform</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainScreen" class="screen">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo-section">
+                        <i class="fas fa-university"></i>
+                        <div class="logo-text">
+                            <h2>Global IME Bank</h2>
+                            <span class="subtitle">Enhanced Analytics Platform</span>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <button id="themeToggle" class="theme-toggle" title="Toggle theme">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                        <div class="user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Welcome, <span id="currentUser">Admin</span></span>
+                        </div>
+                        <button id="logoutBtn" class="btn btn--outline btn--sm">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="container">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-tab="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </button>
+                    <button class="nav-tab" data-tab="predictions">
+                        <i class="fas fa-chart-line"></i> Revenue Predictions
+                    </button>
+                    <button class="nav-tab" data-tab="insights">
+                        <i class="fas fa-analytics"></i> Advanced Insights
+                    </button>
+                    <button class="nav-tab" data-tab="employee">
+                        <i class="fas fa-users"></i> Employee Analytics
+                    </button>
+                    <button class="nav-tab" data-tab="reports">
+                        <i class="fas fa-file-alt"></i> Reports
+                    </button>
+                    <button class="nav-tab" data-tab="settings">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab" class="tab-content active">
+                <div class="container">
+                    <div class="dashboard-overview">
+                        <h3>Dashboard Overview</h3>
+                        <p>Welcome to your comprehensive banking analytics platform</p>
+                        
+                        <!-- KPI Cards -->
+                        <div class="kpi-grid">
+                            <div class="kpi-card">
+                                <div class="kpi-icon">
+                                    <i class="fas fa-money-bill-trend-up"></i>
+                                </div>
+                                <div class="kpi-content">
+                                    <h4>Total Revenue</h4>
+                                    <div class="kpi-value">NPR 45.2M</div>
+                                    <div class="kpi-change positive">+8.3%</div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon">
+                                    <i class="fas fa-building-columns"></i>
+                                </div>
+                                <div class="kpi-content">
+                                    <h4>Active Branches</h4>
+                                    <div class="kpi-value">125</div>
+                                    <div class="kpi-change positive">+5</div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="kpi-content">
+                                    <h4>Total Customers</h4>
+                                    <div class="kpi-value">1.2M</div>
+                                    <div class="kpi-change positive">+12.5%</div>
+                                </div>
+                            </div>
+                            <div class="kpi-card">
+                                <div class="kpi-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="kpi-content">
+                                    <h4>Growth Rate</h4>
+                                    <div class="kpi-value">12.8%</div>
+                                    <div class="kpi-change positive">+2.1%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="quick-actions">
+                            <h4>Quick Actions</h4>
+                            <div class="action-buttons">
+                                <button class="action-btn" data-action="predictions">
+                                    <i class="fas fa-crystal-ball"></i>
+                                    <span>New Prediction</span>
+                                </button>
+                                <button class="action-btn" data-action="insights">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <span>View Insights</span>
+                                </button>
+                                <button class="action-btn" data-action="employee">
+                                    <i class="fas fa-user-tie"></i>
+                                    <span>Employee Stats</span>
+                                </button>
+                                <button class="action-btn" data-action="reports">
+                                    <i class="fas fa-download"></i>
+                                    <span>Export Report</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="recent-activity card">
+                            <div class="card__header">
+                                <h4><i class="fas fa-clock"></i> Recent Activity</h4>
+                            </div>
+                            <div class="card__body">
+                                <div class="activity-list">
+                                    <div class="activity-item">
+                                        <div class="activity-icon success">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <p>Revenue prediction completed for Kathmandu Main Branch</p>
+                                            <span class="activity-time">2 minutes ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <div class="activity-icon info">
+                                            <i class="fas fa-info"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <p>New employee performance data available</p>
+                                            <span class="activity-time">15 minutes ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <div class="activity-icon warning">
+                                            <i class="fas fa-exclamation"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <p>Monthly report generation scheduled</p>
+                                            <span class="activity-time">1 hour ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Predictions Tab -->
+            <div id="predictionsTab" class="tab-content">
+                <div class="container">
+                    <div class="predictions-header">
+                        <h3>Revenue Predictions</h3>
+                        <p>Generate accurate revenue forecasts using advanced ML models</p>
+                    </div>
+                    
+                    <div class="prediction-form-card card">
+                        <div class="card__header">
+                            <h4><i class="fas fa-sliders-h"></i> Prediction Parameters</h4>
+                        </div>
+                        <div class="card__body">
+                            <form id="predictionForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="branchSelect" class="form-label">
+                                            <i class="fas fa-building"></i> Select Branch
+                                        </label>
+                                        <select id="branchSelect" class="form-control" required>
+                                            <option value="">Choose a branch...</option>
+                                            <option value="branch_1">Dailekh Central</option>
+                                            <option value="branch_2">Dang Branch</option>
+                                            <option value="branch_3">Kathmandu Branch</option>
+                                            <option value="branch_4">Kanchanpur Branch</option>
+                                            <option value="branch_5">Salyan Branch</option>
+                                            <option value="branch_6">Kalikot City</option>
+                                            <option value="branch_7">Bara Branch</option>
+                                            <option value="branch_8">Syangja Branch</option>
+                                            <option value="branch_9">Kailali Branch</option>
+                                            <option value="branch_10">Dadeldhura East</option>
+                                            <option value="branch_11">Pyuthan City</option>
+                                            <option value="branch_12">Dhanusha Branch</option>
+                                            <option value="branch_13">Jhapa Branch</option>
+                                            <option value="branch_14">Surkhet Branch</option>
+                                            <option value="branch_15">Kalikot Central</option>
+                                            <option value="branch_16">Kapilvastu Branch</option>
+                                            <option value="branch_17">Dhading North</option>
+                                            <option value="branch_18">Rautahat Branch</option>
+                                            <option value="branch_19">Sunsari Branch</option>
+                                            <option value="branch_20">Sarlahi East</option>
+                                            <option value="branch_21">Kailali Branch</option>
+                                            <option value="branch_22">Kaski Central</option>
+                                            <option value="branch_23">Kavrepalanchok Branch</option>
+                                            <option value="branch_24">Sarlahi West</option>
+                                            <option value="branch_25">Salyan Branch</option>
+                                            <option value="branch_26">Jumla Branch</option>
+                                            <option value="branch_27">Dadeldhura Branch</option>
+                                            <option value="branch_28">Sankhuwasabha Branch</option>
+                                            <option value="branch_29">Kalikot City</option>
+                                            <option value="branch_30">Pyuthan Branch</option>
+                                            <option value="branch_31">Kapilvastu City</option>
+                                            <option value="branch_32">Bajura Branch</option>
+                                            <option value="branch_33">Dhading Branch</option>
+                                            <option value="branch_34">Manang Branch</option>
+                                            <option value="branch_35">Kailali Branch</option>
+                                            <option value="branch_36">Dadeldhura Branch</option>
+                                            <option value="branch_37">Dailekh Branch</option>
+                                            <option value="branch_38">Jajarkot Branch</option>
+                                            <option value="branch_39">Parsa Branch</option>
+                                            <option value="branch_40">Dhankuta Branch</option>
+                                            <option value="branch_41">Dhading Branch</option>
+                                            <option value="branch_42">Rukum West Branch</option>
+                                            <option value="branch_43">Kailali Branch</option>
+                                            <option value="branch_44">Bhaktapur Branch</option>
+                                            <option value="branch_45">Dailekh Branch</option>
+                                            <option value="branch_46">Bajhang City</option>
+                                            <option value="branch_47">Gulmi Branch</option>
+                                            <option value="branch_48">Kailali Branch</option>
+                                            <option value="branch_49">Manang Branch</option>
+                                            <option value="branch_50">Rupandehi Branch</option>
+                                            <option value="branch_51">Dhankuta Branch</option>
+                                            <option value="branch_52">Bajhang Branch</option>
+                                            <option value="branch_53">Terhathum Branch</option>
+                                            <option value="branch_54">Dang Branch</option>
+                                            <option value="branch_55">Bhaktapur Branch</option>
+                                            <option value="branch_56">Dhading Branch</option>
+                                            <option value="branch_57">Sankhuwasabha Central</option>
+                                            <option value="branch_58">Salyan Branch</option>
+                                            <option value="branch_59">Jumla Branch</option>
+                                            <option value="branch_60">Rupandehi Branch</option>
+                                            <option value="branch_61">Dailekh Branch</option>
+                                            <option value="branch_62">Gulmi Branch</option>
+                                            <option value="branch_63">Manang East</option>
+                                            <option value="branch_64">Kavrepalanchok Branch</option>
+                                            <option value="branch_65">Jumla Branch</option>
+                                            <option value="branch_66">Chitwan Central</option>
+                                            <option value="branch_67">Baitadi Branch</option>
+                                            <option value="branch_68">Ilam Branch</option>
+                                            <option value="branch_69">Rupandehi Branch</option>
+                                            <option value="branch_70">Palpa Central</option>
+                                            <option value="branch_71">Salyan Branch</option>
+                                            <option value="branch_72">Taplejung North</option>
+                                            <option value="branch_73">Gulmi Branch</option>
+                                            <option value="branch_74">Rupandehi Branch</option>
+                                            <option value="branch_75">Morang Branch</option>
+                                            <option value="branch_76">Nawalparasi East Branch</option>
+                                            <option value="branch_77">Sarlahi Branch</option>
+                                            <option value="branch_78">Kailali Branch</option>
+                                            <option value="branch_79">Bhaktapur Branch</option>
+
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="monthSelect" class="form-label">
+                                            <i class="fas fa-calendar"></i> Prediction Period
+                                        </label>
+                                        <select id="monthSelect" class="form-control" required>
+                                            <option value="">Select period...</option>
+                                            <option value="1">1 Month</option>
+                                            <option value="2">2 Months</option>
+                                            <option value="3">3 Months</option>
+                                            <option value="4">4 Months</option>
+                                            <option value="5">5 Months</option>
+                                            <option value="6">6 Months</option>
+                                            <option value="7">7 Months</option>
+                                            <option value="8">8 Months</option>
+                                            <option value="9">9 Months</option>
+                                            <option value="10">10 Months</option>
+                                            <option value="11">11 Months</option>
+                                            <option value="12">12 Months</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn--primary btn--lg">
+                                    <i class="fas fa-magic"></i>
+                                    <span class="btn-text">Generate Prediction</span>
+                                    <span class="btn-loading hidden">
+                                        <i class="fas fa-spinner fa-spin"></i> Processing...
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div id="predictionResults" class="prediction-results hidden">
+                        <div class="results-header">
+                            <h4 id="resultsTitle">Prediction Results</h4>
+                            <div class="results-meta">
+                                <span class="status status--success">
+                                    <i class="fas fa-check-circle"></i> Model Accuracy: 87%
+                                </span>
+                                <span class="results-branch" id="selectedBranchName"></span>
+                            </div>
+                        </div>
+
+                        <div class="results-grid">
+                            <div class="chart-section card">
+                                <div class="card__header">
+                                    <h5><i class="fas fa-chart-area"></i> Revenue Trend Analysis</h5>
+                                </div>
+                                <div class="card__body">
+                                    <div class="chart-container">
+                                        <canvas id="revenueChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-section card">
+                                <div class="card__header">
+                                    <h5><i class="fas fa-table"></i> Detailed Predictions</h5>
+                                </div>
+                                <div class="card__body">
+                                    <div class="table-container">
+                                        <table class="prediction-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Month</th>
+                                                    <th>Predicted Revenue</th>
+                                                    <th>Confidence</th>
+                                                    <th>Growth Rate</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="predictionTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Insights Tab -->
+            <div id="insightsTab" class="tab-content">
+                <div class="container">
+                    <div class="insights-header">
+                        <h3>Advanced Insights</h3>
+                        <p>Deep analytics and comprehensive business intelligence</p>
+                    </div>
+
+                    <!-- Insights Sub-navigation -->
+                    <div class="insights-subnav">
+                        <button class="subnav-btn active" data-subtab="overview">
+                            <i class="fas fa-eye"></i> Overview
+                        </button>
+                        <button class="subnav-btn" data-subtab="trends">
+                            <i class="fas fa-trending-up"></i> Trend Analysis
+                        </button>
+                        <button class="subnav-btn" data-subtab="regional">
+                            <i class="fas fa-map-marked-alt"></i> Regional Comparison
+                        </button>
+                        <button class="subnav-btn" data-subtab="forecasting">
+                            <i class="fas fa-brain"></i> Advanced Forecasting
+                        </button>
+                        <button class="subnav-btn" data-subtab="risk">
+                            <i class="fas fa-shield-alt"></i> Risk Analysis
+                        </button>
+                    </div>
+
+                    <!-- Overview Sub-tab -->
+                    <div id="overviewSubtab" class="subtab-content active">
+                        <div class="insights-overview">
+                            <!-- Key Insights Cards -->
+                            <div class="insights-cards">
+                                <div class="insight-card positive">
+                                    <div class="insight-icon">
+                                        <i class="fas fa-arrow-trend-up"></i>
+                                    </div>
+                                    <div class="insight-content">
+                                        <h5>Strong Q4 Performance</h5>
+                                        <p>Revenue grew 8.3% in Q4 2024, driven by increased lending activity and improved fee income from digital services.</p>
+                                        <span class="insight-impact">Positive Impact</span>
+                                    </div>
+                                </div>
+                                <div class="insight-card positive">
+                                    <div class="insight-icon">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                    <div class="insight-content">
+                                        <h5>Digital Banking Adoption</h5>
+                                        <p>78% of customers now use mobile banking, contributing 45% of total fee income through digital transactions.</p>
+                                        <span class="insight-impact">Positive Impact</span>
+                                    </div>
+                                </div>
+                                <div class="insight-card neutral">
+                                    <div class="insight-icon">
+                                        <i class="fas fa-map"></i>
+                                    </div>
+                                    <div class="insight-content">
+                                        <h5>Regional Performance Variation</h5>
+                                        <p>Bagmati Province branches outperform by 15% on average, while Karnali Province shows 12% below-average performance.</p>
+                                        <span class="insight-impact">Requires Attention</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Performance Overview Chart -->
+                            <div class="overview-chart card">
+                                <div class="card__header">
+                                    <h5><i class="fas fa-chart-bar"></i> Revenue Performance Overview</h5>
+                                </div>
+                                <div class="card__body">
+                                    <img src="https://pplx-res.cloudinary.com/image/upload/v1750591036/pplx_code_interpreter/eaad2919_ffsqzm.jpg" alt="Revenue Trend Analysis" class="insights-chart-image">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trends Sub-tab -->
+                    <div id="trendsSubtab" class="subtab-content">
+                        <div class="trends-analysis">
+                            <div class="trends-header">
+                                <h4>Comprehensive Trend Analysis</h4>
+                                <p>Seasonal patterns, growth trajectories, and market dynamics</p>
+                            </div>
+                            
+                            <div class="trends-grid">
+                                <div class="trend-card card">
+                                    <div class="card__header">
+                                        <h5><i class="fas fa-calendar-alt"></i> Seasonal Revenue Patterns</h5>
+                                    </div>
+                                    <div class="card__body">
+                                        <div class="trend-insights">
+                                            <div class="trend-item">
+                                                <span class="trend-period">Q1 (Jan-Mar)</span>
+                                                <span class="trend-value">+5.2% avg growth</span>
+                                                <span class="trend-note">Post-festival recovery</span>
+                                            </div>
+                                            <div class="trend-item">
+                                                <span class="trend-period">Q2 (Apr-Jun)</span>
+                                                <span class="trend-value">+7.1% avg growth</span>
+                                                <span class="trend-note">Business expansion peak</span>
+                                            </div>
+                                            <div class="trend-item">
+                                                <span class="trend-period">Q3 (Jul-Sep)</span>
+                                                <span class="trend-value">+3.8% avg growth</span>
+                                                <span class="trend-note">Monsoon impact</span>
+                                            </div>
+                                            <div class="trend-item">
+                                                <span class="trend-period">Q4 (Oct-Dec)</span>
+                                                <span class="trend-value">+8.3% avg growth</span>
+                                                <span class="trend-note">Festival season boost</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="kpi-overview card">
+                                    <div class="card__header">
+                                        <h5><i class="fas fa-tachometer-alt"></i> Key Performance Indicators</h5>
+                                    </div>
+                                    <div class="card__body">
+                                        <img src="https://pplx-res.cloudinary.com/image/upload/v1750591201/pplx_code_interpreter/088eaf43_mfjujg.jpg" alt="Banking KPI Dashboard" class="insights-chart-image">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Regional Sub-tab -->
+                    <div id="regionalSubtab" class="subtab-content">
+                        <div class="regional-analysis">
+                            <div class="regional-header">
+                                <h4>Regional Performance Comparison</h4>
+                                <p>Province and district-wise performance analysis</p>
+                            </div>
+                            
+                            <div class="regional-grid">
+                                <div class="province-performance card">
+                                    <div class="card__header">
+                                        <h5><i class="fas fa-map-marker-alt"></i> Province Performance Ranking</h5>
+                                    </div>
+                                    <div class="card__body">
+                                        <div class="performance-list">
+                                            <div class="performance-item top-performer">
+                                                <span class="rank">1</span>
+                                                <span class="province">Bagmati Province</span>
+                                                <span class="performance">+15.2%</span>
+                                            </div>
+                                            <div class="performance-item good-performer">
+                                                <span class="rank">2</span>
+                                                <span class="province">Gandaki Province</span>
+                                                <span class="performance">+8.7%</span>
+                                            </div>
+                                            <div class="performance-item average-performer">
+                                                <span class="rank">3</span>
+                                                <span class="province">Lumbini Province</span>
+                                                <span class="performance">+3.2%</span>
+                                            </div>
+                                            <div class="performance-item below-performer">
+                                                <span class="rank">4</span>
+                                                <span class="province">Karnali Province</span>
+                                                <span class="performance">-12.3%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="market-factors card">
+                                    <div class="card__header">
+                                        <h5><i class="fas fa-chart-pie"></i> Regional Market Factors</h5>
+                                    </div>
+                                    <div class="card__body">
+                                        <div class="factor-list">
+                                            <div class="factor-item">
+                                                <i class="fas fa-city"></i>
+                                                <span>Urbanization Level: High impact on digital adoption</span>
+                                            </div>
+                                            <div class="factor-item">
+                                                <i class="fas fa-road"></i>
+                                                <span>Infrastructure: Critical for branch accessibility</span>
+                                            </div>
+                                            <div class="factor-item">
+                                                <i class="fas fa-seedling"></i>
+                                                <span>Agricultural Activity: Seasonal revenue patterns</span>
+                                            </div>
+                                            <div class="factor-item">
+                                                <i class="fas fa-industry"></i>
+                                                <span>Industry Presence: Commercial banking demand</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Forecasting Sub-tab -->
+                    <div id="forecastingSubtab" class="subtab-content">
+                        <div class="forecasting-analysis">
+                            <div class="forecasting-header">
+                                <h4>Advanced ML Forecasting Models</h4>
+                                <p>Machine learning insights and confidence intervals</p>
+                            </div>
+                            
+                            <div class="forecasting-grid">
+                                <div class="model-performance card">
+                                    <div class="card__header">
+                                        <h5><i class="fas fa-brain"></i> Model Performance Metrics</h5>
+                                    </div>
+                                    <div class="card__body">
+                                        <div class="metrics-grid">
+                                            <div class="metric-item">
+                                                <div class="metric-label">Model Accuracy</div>
+                                                <div class="metric-value">87.3%</div>
+                                                <div class="metric-trend positive">+2.1%</div>
+                                            </div>
+                                            <div class="metric-item">
+                                                <div class="metric-label">Prediction Confidence</div>
+                                                <div class="metric-value">92.1%</div>
+                                                <div class="metric-trend positive">+0.8%</div>
+                                            </div>
+                                            <div class="metric-item">
+                                                <div class="metric-label">Error Rate</div>
+                                                <div class="metric-value">4.2%</div>
+                                                <div class="metric-trend negative">-1.3%</div>
+                                            </div>
+                                            <div class="metric-item">
+                                                <div class="metric-label">Data Quality Score</div>
+                                                <div class="metric-value">94.8%</div>
+                                                <div class="metric-trend positive">+1.2%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="scenario-analysis card">
+                                    <div class="card__header">
+                                        <h5><i class="fas fa-sitemap"></i> Scenario Analysis</h5>
+                                    </div>
+                                    <div class="card__body">
+                                        <div class="scenario-list">
+                                            <div class="scenario-item optimistic">
+                                                <div class="scenario-label">
+                                                    <i class="fas fa-arrow-up"></i> Optimistic Scenario
+                                                </div>
+                                                <div class="scenario-description">Economic growth acceleration, increased lending</div>
+                                                <div class="scenario-impact">+12.5% revenue growth</div>
+                                            </div>
+                                            <div class="scenario-item baseline">
+                                                <div class="scenario-label">
+                                                    <i class="fas fa-equals"></i> Baseline Scenario
+                                                </div>
+                                                <div class="scenario-description">Current trends continue, stable market conditions</div>
+                                                <div class="scenario-impact">+6.2% revenue growth</div>
+                                            </div>
+                                            <div class="scenario-item pessimistic">
+                                                <div class="scenario-label">
+                                                    <i class="fas fa-arrow-down"></i> Pessimistic Scenario
+                                                </div>
+                                                <div class="scenario-description">Economic slowdown, regulatory challenges</div>
+                                                <div class="scenario-impact">-2.1% revenue decline</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Analysis Sub-tab -->
+                    <div id="riskSubtab" class="subtab-content">
+                        <div class="risk-analysis">
+                            <div class="risk-header">
+                                <h4>Risk Assessment & Compliance</h4>
+                                <p>Risk factors, market conditions, and regulatory compliance metrics</p>
+                            </div>
+                            
+                            <div class="risk-grid">
+                                <div class="risk-factors card">
+                                    <div class="card__header">
+                                        <h5><i class="fas fa-exclamation-triangle"></i> Key Risk Factors</h5>
+                                    </div>
+                                    <div class="card__body">
+                                        <div class="risk-list">
+                                            <div class="risk-item high-risk">
+                                                <div class="risk-indicator"></div>
+                                                <div class="risk-content">
+                                                    <div class="risk-name">Interest Rate Volatility</div>
+                                                    <div class="risk-impact">High Impact - May affect growth by ±3.5%</div>
+                                                    <div class="risk-probability">Probability: 65%</div>
+                                                </div>
+                                            </div>
+                                            <div class="risk-item medium-risk">
+                                                <div class="risk-indicator"></div>
+                                                <div class="risk-content">
+                                                    <div class="risk-name">Regulatory Changes</div>
+                                                    <div class="risk-impact">Medium Impact - Compliance costs</div>
+                                                    <div class="risk-probability">Probability: 40%</div>
+                                                </div>
+                                            </div>
+                                            <div class="risk-item low-risk">
+                                                <div class="risk-indicator"></div>
+                                                <div class="risk-content">
+                                                    <div class="risk-name">Technology Disruption</div>
+                                                    <div class="risk-impact">Low Impact - Gradual adaptation needed</div>
+                                                    <div class="risk-probability">Probability: 25%</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="compliance-metrics card">
+                                    <div class="card__header">
+                                        <h5><i class="fas fa-shield-check"></i> Compliance Status</h5>
+                                    </div>
+                                    <div class="card__body">
+                                        <div class="compliance-items">
+                                            <div class="compliance-item compliant">
+                                                <i class="fas fa-check-circle"></i>
+                                                <span>Basel III Requirements</span>
+                                                <div class="compliance-status">Compliant</div>
+                                            </div>
+                                            <div class="compliance-item compliant">
+                                                <i class="fas fa-check-circle"></i>
+                                                <span>Anti-Money Laundering</span>
+                                                <div class="compliance-status">Compliant</div>
+                                            </div>
+                                            <div class="compliance-item warning">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                                <span>Data Privacy Regulations</span>
+                                                <div class="compliance-status">Review Required</div>
+                                            </div>
+                                            <div class="compliance-item compliant">
+                                                <i class="fas fa-check-circle"></i>
+                                                <span>Credit Risk Management</span>
+                                                <div class="compliance-status">Compliant</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employee Analytics Tab -->
+            <div id="employeeTab" class="tab-content">
+                <div class="container">
+                    <div class="employee-header">
+                        <h3>Employee Analytics</h3>
+                        <p>Performance dashboards and HR insights</p>
+                    </div>
+
+                    <div class="employee-dashboard">
+                        <!-- Employee Performance Overview -->
+                        <div class="employee-overview">
+                            <div class="performance-cards">
+                                <div class="perf-card">
+                                    <div class="perf-icon">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="perf-content">
+                                        <h5>Average Performance</h5>
+                                        <div class="perf-value">4.3/5.0</div>
+                                        <div class="perf-change positive">+0.2</div>
+                                    </div>
+                                </div>
+                                <div class="perf-card">
+                                    <div class="perf-icon">
+                                        <i class="fas fa-target"></i>
+                                    </div>
+                                    <div class="perf-content">
+                                        <h5>Target Achievement</h5>
+                                        <div class="perf-value">98.5%</div>
+                                        <div class="perf-change positive">+5.2%</div>
+                                    </div>
+                                </div>
+                                <div class="perf-card">
+                                    <div class="perf-icon">
+                                        <i class="fas fa-smile"></i>
+                                    </div>
+                                    <div class="perf-content">
+                                        <h5>Customer Satisfaction</h5>
+                                        <div class="perf-value">4.6/5.0</div>
+                                        <div class="perf-change positive">+0.1</div>
+                                    </div>
+                                </div>
+                                <div class="perf-card">
+                                    <div class="perf-icon">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </div>
+                                    <div class="perf-content">
+                                        <h5>Training Completion</h5>
+                                        <div class="perf-value">87%</div>
+                                        <div class="perf-change positive">+12%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Employee Performance Chart -->
+                        <div class="employee-chart card">
+                            <div class="card__header">
+                                <h5><i class="fas fa-chart-bar"></i> Employee Performance Analysis</h5>
+                            </div>
+                            <div class="card__body">
+                                <img src="https://pplx-res.cloudinary.com/image/upload/v1750591095/pplx_code_interpreter/007a915b_lpvqtx.jpg" alt="Employee Performance Analytics" class="insights-chart-image">
+                            </div>
+                        </div>
+
+                        <!-- Top Performers -->
+                        <div class="top-performers card">
+                            <div class="card__header">
+                                <h5><i class="fas fa-trophy"></i> Top Performers This Month</h5>
+                            </div>
+                            <div class="card__body">
+                                <div class="performer-list">
+                                    <div class="performer-item first-place">
+                                        <div class="performer-rank">1</div>
+                                        <div class="performer-info">
+                                            <div class="performer-name">राज कुमार शर्मा</div>
+                                            <div class="performer-role">Branch Manager</div>
+                                            <div class="performer-branch">Kathmandu Main</div>
+                                        </div>
+                                        <div class="performer-score">4.8/5.0</div>
+                                    </div>
+                                    <div class="performer-item second-place">
+                                        <div class="performer-rank">2</div>
+                                        <div class="performer-info">
+                                            <div class="performer-name">सीता देवी पौडेल</div>
+                                            <div class="performer-role">Loan Officer</div>
+                                            <div class="performer-branch">Pokhara Branch</div>
+                                        </div>
+                                        <div class="performer-score">4.5/5.0</div>
+                                    </div>
+                                    <div class="performer-item third-place">
+                                        <div class="performer-rank">3</div>
+                                        <div class="performer-info">
+                                            <div class="performer-name">अमित श्रेष्ठ</div>
+                                            <div class="performer-role">Customer Officer</div>
+                                            <div class="performer-branch">Biratnagar Branch</div>
+                                        </div>
+                                        <div class="performer-score">4.2/5.0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Training & Development -->
+                        <div class="training-section card">
+                            <div class="card__header">
+                                <h5><i class="fas fa-book-open"></i> Training & Development</h5>
+                            </div>
+                            <div class="card__body">
+                                <div class="training-stats">
+                                    <div class="training-item">
+                                        <div class="training-metric">
+                                            <span class="metric-label">Ongoing Programs</span>
+                                            <span class="metric-value">12</span>
+                                        </div>
+                                        <div class="training-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 75%"></div>
+                                            </div>
+                                            <span class="progress-text">75% completion rate</span>
+                                        </div>
+                                    </div>
+                                    <div class="training-item">
+                                        <div class="training-metric">
+                                            <span class="metric-label">Skill Assessments</span>
+                                            <span class="metric-value">8</span>
+                                        </div>
+                                        <div class="training-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 82%"></div>
+                                            </div>
+                                            <span class="progress-text">82% pass rate</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="reportsTab" class="tab-content">
+                <div class="container">
+                    <div class="reports-header">
+                        <h3>Reports & Export</h3>
+                        <p>Generate and download comprehensive business reports</p>
+                    </div>
+
+                    <div class="reports-dashboard">
+                        <div class="report-types">
+                            <div class="report-card">
+                                <div class="report-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="report-content">
+                                    <h5>Revenue Analysis Report</h5>
+                                    <p>Comprehensive revenue trends and predictions</p>
+                                    <button class="btn btn--primary btn--sm">
+                                        <i class="fas fa-download"></i> Generate PDF
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="report-card">
+                                <div class="report-icon">
+                                    <i class="fas fa-users-cog"></i>
+                                </div>
+                                <div class="report-content">
+                                    <h5>Employee Performance Report</h5>
+                                    <p>Staff performance metrics and analytics</p>
+                                    <button class="btn btn--primary btn--sm">
+                                        <i class="fas fa-download"></i> Generate PDF
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="report-card">
+                                <div class="report-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="report-content">
+                                    <h5>Risk Assessment Report</h5>
+                                    <p>Risk factors and compliance analysis</p>
+                                    <button class="btn btn--primary btn--sm">
+                                        <i class="fas fa-download"></i> Generate PDF
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="report-card">
+                                <div class="report-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="report-content">
+                                    <h5>Branch Performance Report</h5>
+                                    <p>Branch-wise performance comparison</p>
+                                    <button class="btn btn--primary btn--sm">
+                                        <i class="fas fa-download"></i> Generate PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="export-options card">
+                            <div class="card__header">
+                                <h5><i class="fas fa-file-export"></i> Export Options</h5>
+                            </div>
+                            <div class="card__body">
+                                <div class="export-formats">
+                                    <button class="export-btn">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <span>Export as PDF</span>
+                                    </button>
+                                    <button class="export-btn">
+                                        <i class="fas fa-file-excel"></i>
+                                        <span>Export as Excel</span>
+                                    </button>
+                                    <button class="export-btn">
+                                        <i class="fas fa-file-csv"></i>
+                                        <span>Export as CSV</span>
+                                    </button>
+                                    <button class="export-btn">
+                                        <i class="fas fa-file-powerpoint"></i>
+                                        <span>Export as PowerPoint</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settingsTab" class="tab-content">
+                <div class="container">
+                    <div class="settings-header">
+                        <h3>Settings</h3>
+                        <p>Configure your preferences and system settings</p>
+                    </div>
+
+                    <div class="settings-dashboard">
+                        <div class="settings-sections">
+                            <div class="settings-card">
+                                <div class="card__header">
+                                    <h5><i class="fas fa-palette"></i> Appearance</h5>
+                                </div>
+                                <div class="card__body">
+                                    <div class="setting-item">
+                                        <label class="setting-label">
+                                            <i class="fas fa-moon"></i> Theme
+                                        </label>
+                                        <div class="theme-options">
+                                            <button class="theme-option active" data-theme="light">
+                                                <i class="fas fa-sun"></i> Light
+                                            </button>
+                                            <button class="theme-option" data-theme="dark">
+                                                <i class="fas fa-moon"></i> Dark
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <div class="card__header">
+                                    <h5><i class="fas fa-bell"></i> Notifications</h5>
+                                </div>
+                                <div class="card__body">
+                                    <div class="setting-item">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" checked>
+                                            <span class="checkmark"></span>
+                                            Email notifications
+                                        </label>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" checked>
+                                            <span class="checkmark"></span>
+                                            Push notifications
+                                        </label>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox">
+                                            <span class="checkmark"></span>
+                                            SMS alerts
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <div class="card__header">
+                                    <h5><i class="fas fa-database"></i> Data & Privacy</h5>
+                                </div>
+                                <div class="card__body">
+                                    <div class="setting-item">
+                                        <label class="setting-label">Data retention period</label>
+                                        <select class="form-control">
+                                            <option value="12">12 months</option>
+                                            <option value="24" selected>24 months</option>
+                                            <option value="36">36 months</option>
+                                        </select>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" checked>
+                                            <span class="checkmark"></span>
+                                            Allow analytics data collection
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Chat Assistant --> 
+    <div id="chatAssistant" class="chat-assistant">
+        <div class="chat-header" id="chatHeader">
+            <div class="chat-title">
+                <i class="fas fa-robot"></i>
+                <span>Banking Assistant</span>
+            </div>
+            <div class="chat-controls">
+                <button class="chat-minimize" id="chatMinimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="chat-content" id="chatContent">
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message bot-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Hello! I'm your banking assistant. I can help you with revenue predictions, analytics, and system navigation. How can I assist you today?</p>
+                        <span class="message-time">Now</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Ask me anything about banking analytics...">
+                <button id="chatSend" class="chat-send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notifications" class="notifications-container"></div>
+
+    <script src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,866 @@
+// Global Application State
+let appState = {
+    currentUser: '',
+    selectedBranch: null,
+    selectedMonths: 0,
+    currentTheme: 'light',
+    activeTab: 'dashboard',
+    activeSubtab: 'overview',
+    charts: {},
+    loadingComplete: false,
+    chatExpanded: true
+};
+
+// Application Data
+const applicationData = {
+    
+    kpis: {
+        totalRevenue: 45200000,
+        revenueGrowth: 8.3,
+        activeBranches: 125,
+        newBranches: 5,
+        totalCustomers: 1200000,
+        customerGrowth: 12.5,
+        overallGrowthRate: 12.8,
+        growthIncrease: 2.1
+    },
+    
+    employees: [
+        {
+            id: "EMP001",
+            name: "राज कुमार शर्मा",
+            role: "Branch Manager",
+            branch: "Kathmandu Main",
+            performanceScore: 4.8,
+            targetsAchieved: 112,
+            customerSatisfaction: 4.6,
+            experience: 8
+        },
+        {
+            id: "EMP002",
+            name: "सीता देवी पौडेल",
+            role: "Loan Officer",
+            branch: "Pokhara",
+            performanceScore: 4.5,
+            targetsAchieved: 98,
+            customerSatisfaction: 4.4,
+            experience: 5
+        },
+        {
+            id: "EMP003",
+            name: "अमित श्रेष्ठ",
+            role: "Customer Officer",
+            branch: "Biratnagar",
+            performanceScore: 4.2,
+            targetsAchieved: 88,
+            customerSatisfaction: 4.2,
+            experience: 3
+        },
+        {
+            id: "EMP004",
+            name: "प्रिया गुरुङ",
+            role: "Credit Analyst",
+            branch: "Kathmandu Main",
+            performanceScore: 4.7,
+            targetsAchieved: 105,
+            customerSatisfaction: 4.5,
+            experience: 6
+        },
+        {
+            id: "EMP005",
+            name: "रामेश खत्री",
+            role: "Teller",
+            branch: "Pokhara",
+            performanceScore: 4.0,
+            targetsAchieved: 85,
+            customerSatisfaction: 4.1,
+            experience: 2
+        }
+    ],
+    
+    insights: {
+        keyFindings: [
+            "Revenue shows consistent growth trend with 6.2% average monthly increase",
+            "Digital banking adoption increasing revenue by 15% annually",
+            "Bagmati Province branches outperform national average by 12%",
+            "Customer acquisition cost reduced by 18% through digital channels",
+            "Mobile banking users contribute 45% of total fee income"
+        ],
+        recommendations: [
+            "Accelerate digital transformation initiatives in rural branches",
+            "Implement AI-powered customer service chatbots",
+            "Expand lending portfolio in high-growth sectors",
+            "Strengthen risk management frameworks",
+            "Invest in employee training for new financial products"
+        ],
+        riskFactors: [
+            {
+                name: "Interest Rate Volatility",
+                impact: "High",
+                probability: 65,
+                description: "Central bank policy changes may affect lending margins"
+            },
+            {
+                name: "Regulatory Changes",
+                impact: "Medium",
+                probability: 40,
+                description: "New compliance requirements may increase operational costs"
+            },
+            {
+                name: "Cybersecurity Threats",
+                impact: "High",
+                probability: 30,
+                description: "Digital transformation increases cyber risk exposure"
+            }
+        ]
+    },
+    
+    chatResponses: [
+        {
+            trigger: "hello",
+            response: "Hello! I'm your Global IME Bank assistant. I can help you with revenue predictions, analytics insights, employee performance, and system navigation. What would you like to know?"
+        },
+        {
+            trigger: "revenue",
+            response: "Our advanced ML models analyze historical data, seasonal patterns, and economic indicators to predict revenue with 87% accuracy. You can generate predictions for up to 12 months ahead."
+        },
+        {
+            trigger: "prediction",
+            response: "To generate a revenue prediction, go to the Revenue Predictions tab, select your branch and time period, then click 'Generate Prediction'. The system will show detailed forecasts with confidence intervals."
+        },
+        {
+            trigger: "employee",
+            response: "The Employee Analytics section provides comprehensive performance metrics, training progress, and customer satisfaction scores. You can view individual and team performance data."
+        },
+        {
+            trigger: "insight",
+            response: "The Advanced Insights tab offers deep analytics across 5 areas: Overview, Trend Analysis, Regional Comparison, Advanced Forecasting, and Risk Analysis. Each provides detailed business intelligence."
+        },
+        {
+            trigger: "export",
+            response: "You can export reports in multiple formats (PDF, Excel, CSV, PowerPoint) from the Reports tab. All charts and data tables can be downloaded for presentations."
+        },
+        {
+            trigger: "theme",
+            response: "You can switch between light and dark themes using the toggle button in the header. Your preference will be saved for future sessions."
+        }
+    ]
+};
+
+// Utility Functions
+const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-NP', {
+        style: 'currency',
+        currency: 'NPR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount).replace('NPR', 'NPR ');
+};
+
+const formatNumber = (number) => {
+    return new Intl.NumberFormat('en-US').format(number);
+};
+
+const showNotification = (message, type = 'success') => {
+    const container = document.getElementById('notifications');
+    if (!container) return;
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    container.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+};
+
+const generateId = () => {
+    return Math.random().toString(36).substr(2, 9);
+};
+
+// Theme Management
+const initializeTheme = () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    appState.currentTheme = savedTheme;
+    document.body.setAttribute('data-theme', savedTheme);
+    updateThemeButton();
+};
+
+const toggleTheme = () => {
+    appState.currentTheme = appState.currentTheme === 'light' ? 'dark' : 'light';
+    document.body.setAttribute('data-theme', appState.currentTheme);
+    localStorage.setItem('theme', appState.currentTheme);
+    updateThemeButton();
+    showNotification(`Switched to ${appState.currentTheme} theme`, 'success');
+};
+
+const updateThemeButton = () => {
+    const themeToggle = document.getElementById('themeToggle');
+    const themeOptions = document.querySelectorAll('.theme-option');
+    
+    if (themeToggle) {
+        const icon = themeToggle.querySelector('i');
+        icon.className = appState.currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+    }
+    
+    themeOptions.forEach(option => {
+        option.classList.toggle('active', option.dataset.theme === appState.currentTheme);
+    });
+};
+
+// Navigation Management
+const switchTab = (tabId) => {
+    appState.activeTab = tabId;
+    
+    // Update navigation
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabId);
+    });
+    
+    // Update content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.toggle('active', content.id === `${tabId}Tab`);
+    });
+    
+    // Initialize tab-specific content
+    if (tabId === 'insights') {
+        switchSubtab('overview');
+    }
+};
+
+const switchSubtab = (subtabId) => {
+    appState.activeSubtab = subtabId;
+    
+    // Update subnav buttons
+    document.querySelectorAll('.subnav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.subtab === subtabId);
+    });
+    
+    // Update subtab content
+    document.querySelectorAll('.subtab-content').forEach(content => {
+        content.classList.toggle('active', content.id === `${subtabId}Subtab`);
+    });
+};
+
+// Loading Screen Management
+const startLoadingSequence = () => {
+    const loadingTexts = [
+        "Initializing System...",
+        "Loading Bank Data...",
+        "Connecting to ML Models...",
+        "Preparing Analytics...",
+        "Finalizing Setup..."
+    ];
+    
+    let currentIndex = 0;
+    const loadingText = document.getElementById('loadingText');
+    
+    const updateLoadingText = () => {
+        if (loadingText && currentIndex < loadingTexts.length) {
+            loadingText.textContent = loadingTexts[currentIndex];
+            currentIndex++;
+            setTimeout(updateLoadingText, 1000);
+        }
+    };
+    
+    updateLoadingText();
+    
+    setTimeout(() => {
+        appState.loadingComplete = true;
+        showScreen('loginScreen');
+    }, 5000);
+};
+
+const showScreen = (screenId) => {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    
+    const targetScreen = document.getElementById(screenId);
+    if (targetScreen) {
+        targetScreen.classList.add('active');
+    }
+};
+
+// Authentication
+const handleLogin = (e) => {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    
+    // Clear previous errors
+    document.querySelectorAll('.error-message').forEach(error => {
+        error.classList.remove('show');
+    });
+    
+    // Validate inputs
+    let isValid = true;
+    
+    if (!username) {
+        showError('username', 'Username is required');
+        isValid = false;
+    }
+    
+    if (!password) {
+        showError('password', 'Password is required');
+        isValid = false;
+    } else if (password.length < 6) {
+        showError('password', 'Password must be at least 6 characters');
+        isValid = false;
+    }
+    
+    if (isValid) {
+        appState.currentUser = username;
+        const currentUserElement = document.getElementById('currentUser');
+        if (currentUserElement) {
+            currentUserElement.textContent = username;
+        }
+        showScreen('mainScreen');
+        showNotification(`Welcome back, ${username}!`, 'success');
+        chatBox = document.getElementById('chatAssistant');
+        chatBox.classList.remove('hidden');
+    }
+};
+
+const showError = (fieldId, message) => {
+    const errorElement = document.getElementById(fieldId + 'Error');
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.classList.add('show');
+    }
+};
+
+const handleLogout = () => {
+    appState.currentUser = '';
+    appState.selectedBranch = null;
+    appState.selectedMonths = 0;
+    
+    // Reset forms
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => form.reset());
+    
+    // Clear errors
+    document.querySelectorAll('.error-message').forEach(error => {
+        error.classList.remove('show');
+    });
+
+     chatBox = document.getElementById('chatAssistant');
+     chatBox.classList.add('hidden');
+    
+    showScreen('loginScreen');
+    showNotification('Logged out successfully', 'success');
+};
+
+// Prediction System
+const handlePrediction = (e) => {
+    e.preventDefault();
+    
+    const branchId = document.getElementById('branchSelect').value;
+    const months = parseInt(document.getElementById('monthSelect').value);
+    
+    if (!branchId || !months) {
+        showNotification('Please select both branch and prediction period', 'error');
+        return;
+    }
+    
+    // Show loading state
+    const btnText = document.querySelector('.btn-text');
+    const btnLoading = document.querySelector('.btn-loading');
+    
+    if (btnText && btnLoading) {
+        btnText.classList.add('hidden');
+        btnLoading.classList.remove('hidden');
+    }
+    
+    appState.selectedMonths = months;
+    //api call to fetch branch data
+    fetch(`http://localhost:8000/api/predict/${branchId}/${months}`)
+        .then(response => response.json())
+        .then(data => {
+            // console.log('Branch data fetched:',data);
+            appState.selectedBranch = data
+               // Simulate processing delay
+    setTimeout(() => {
+        generatePredictionResults();
+        
+        // Reset button state
+        if (btnText && btnLoading) {
+            btnText.classList.remove('hidden');
+            btnLoading.classList.add('hidden');
+        }
+        
+        // Show results
+        const resultsSection = document.getElementById('predictionResults');
+        if (resultsSection) {
+            resultsSection.classList.remove('hidden');
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        showNotification('Prediction generated successfully!', 'success');
+    }, 2000);
+        })
+        .catch(error => {
+            console.error('Error fetching branch data:', error);
+            showNotification('Failed to fetch branch data', 'error');
+        });
+};
+
+const generatePredictionResults = () => {
+    if (!appState.selectedBranch) return;
+    
+    // Update results header
+    const resultsTitle = document.getElementById('resultsTitle');
+    const selectedBranchName = document.getElementById('selectedBranchName');
+    
+    if (resultsTitle) {
+        resultsTitle.textContent = `Revenue Prediction - ${appState.selectedBranch.name}`;
+    }
+    if (selectedBranchName) {
+        selectedBranchName.textContent = appState.selectedBranch.name;
+    }
+    
+    // Generate prediction data
+    const predictions = appState.selectedBranch.predictedRevenue;
+    
+    // Create chart
+    createRevenueChart(appState.selectedBranch, predictions);
+    
+    // Populate table
+    populatePredictionTable(predictions);
+};
+
+
+const createRevenueChart = (branchData, predictions) => {
+    const canvas = document.getElementById('revenueChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Destroy existing chart
+    if (appState.charts.revenue) {
+        appState.charts.revenue.destroy();
+    }
+    
+    const historicalLabels = branchData.historicalRevenue.map(item => item.month);
+    const historicalData = branchData.historicalRevenue.map(item => item.revenue);
+    const predictionLabels = predictions.map(item => item.month);
+    const predictionData = predictions.map(item => item.revenue);
+    
+    const allLabels = [...historicalLabels, ...predictionLabels];
+    const allHistoricalData = [...historicalData, ...new Array(predictions.length).fill(null)];
+    const allPredictionData = [...new Array(historicalData.length).fill(null), ...predictionData];
+    
+    appState.charts.revenue = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: allLabels,
+            datasets: [
+                {
+                    label: 'Historical Revenue',
+                    data: allHistoricalData,
+                    borderColor: '#023570',
+                    backgroundColor: 'rgba(2, 53, 112, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#023570',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                },
+                {
+                    label: 'Predicted Revenue',
+                    data: allPredictionData,
+                    borderColor: '#c5161d',
+                    backgroundColor: 'rgba(197, 22, 29, 0.1)',
+                    borderWidth: 3,
+                    borderDash: [10, 5],
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#c5161d',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Revenue Forecast: ${branchData.name}`,
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    color: '#023570'
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return formatCurrency(value);
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+};
+
+const populatePredictionTable = (predictions) => {
+    const tbody = document.getElementById('predictionTableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    predictions.forEach(prediction => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${prediction.month}</td>
+            <td>${formatCurrency(prediction.revenue)}</td>
+            <td><span class="status status--success">${prediction.confidence.toFixed(1)}%</span></td>
+            <td class="${prediction.growth > 0 ? 'text-success' : 'text-error'}">${prediction.growth > 0 ? '+' : ''}${prediction.growth.toFixed(1)}%</td>
+        `;
+        tbody.appendChild(row);
+    });
+};
+
+// Chat System
+const initializeChatSystem = () => {
+    const chatHeader = document.getElementById('chatHeader');
+    const chatContent = document.getElementById('chatContent');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+    const chatMinimize = document.getElementById('chatMinimize');
+    
+    if (!chatHeader || !chatContent || !chatInput || !chatSend) return;
+    
+    // Chat toggle
+    if (chatMinimize) {
+        chatMinimize.addEventListener('click', (e) => {
+            e.stopPropagation();
+            appState.chatExpanded = !appState.chatExpanded;
+            chatContent.classList.toggle('collapsed', !appState.chatExpanded);
+            
+            const icon = chatMinimize.querySelector('i');
+            icon.className = appState.chatExpanded ? 'fas fa-minus' : 'fas fa-plus';
+        });
+    }
+    
+    // Send message function
+    const sendMessage = () => {
+        const message = chatInput.value.trim();
+        if (!message) return;
+        
+        addChatMessage(message, 'user');
+        chatInput.value = '';
+        
+        // Simulate typing indicator
+        setTimeout(() => {
+            const response = generateChatResponse(message);
+            addChatMessage(response, 'bot');
+        }, 1500);
+    };
+    
+    // Event listeners
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+};
+
+const addChatMessage = (message, sender) => {
+    const chatMessages = document.getElementById('chatMessages');
+    if (!chatMessages) return;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${sender}-message`;
+    
+    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    messageDiv.innerHTML = `
+        <div class="message-avatar">
+            <i class="fas ${sender === 'bot' ? 'fa-robot' : 'fa-user'}"></i>
+        </div>
+        <div class="message-content">
+            <p>${message}</p>
+            <span class="message-time">${currentTime}</span>
+        </div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+};
+
+const generateChatResponse = (userMessage) => {
+    const lowerMessage = userMessage.toLowerCase();
+    
+    // Find matching response
+    const matchingResponse = applicationData.chatResponses.find(response => 
+        lowerMessage.includes(response.trigger)
+    );
+    
+    if (matchingResponse) {
+        return matchingResponse.response;
+    }
+    
+    // Contextual responses
+    if (lowerMessage.includes('branch') || lowerMessage.includes('location')) {
+        return `We have ${applicationData.branches.length} major branches in the system. You can select any branch for revenue predictions. Our top performing branches are in Kathmandu and Pokhara.`;
+    }
+    
+    if (lowerMessage.includes('performance') || lowerMessage.includes('employee')) {
+        return "Our Employee Analytics section shows comprehensive performance metrics. The average performance score across all employees is 4.3/5.0 with 98.5% target achievement rate.";
+    }
+    
+    if (lowerMessage.includes('kpi') || lowerMessage.includes('metric')) {
+        return "Key performance indicators show strong growth: 8.3% revenue increase, 12.5% customer growth, and 87% model accuracy for predictions.";
+    }
+    
+    if (lowerMessage.includes('risk') || lowerMessage.includes('compliance')) {
+        return "Our Risk Analysis section monitors key factors including interest rate volatility, regulatory changes, and cybersecurity threats. Current compliance status is excellent across all major frameworks.";
+    }
+    
+    if (lowerMessage.includes('report') || lowerMessage.includes('download')) {
+        return "You can generate and download reports in multiple formats from the Reports tab. Available formats include PDF, Excel, CSV, and PowerPoint presentations.";
+    }
+    
+    // Default response
+    return "I'm here to help with the Global IME Bank analytics platform. You can ask me about revenue predictions, employee performance, risk analysis, reports, or how to navigate the system. What specific information do you need?";
+};
+
+// Quick Actions
+const handleQuickAction = (action) => {
+    switch (action) {
+        case 'predictions':
+            switchTab('predictions');
+            document.getElementById('branchSelect')?.focus();
+            break;
+        case 'insights':
+            switchTab('insights');
+            break;
+        case 'employee':
+            switchTab('employee');
+            break;
+        case 'reports':
+            switchTab('reports');
+            break;
+        default:
+            console.log('Unknown action:', action);
+    }
+};
+
+// Export Functions
+const exportReport = (format, reportType) => {
+    showNotification(`Generating ${reportType} report in ${format.toUpperCase()} format...`, 'success');
+    
+    // Simulate export process
+    setTimeout(() => {
+        showNotification(`${reportType} report downloaded successfully!`, 'success');
+    }, 2000);
+};
+
+// Settings Management
+const handleThemeChange = (theme) => {
+    if (theme !== appState.currentTheme) {
+        toggleTheme();
+    }
+};
+
+// Event Listeners Setup
+const initializeEventListeners = () => {
+    // Login form
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
+    
+    // Prediction form
+    const predictionForm = document.getElementById('predictionForm');
+    if (predictionForm) {
+        predictionForm.addEventListener('submit', handlePrediction);
+    }
+    
+    // Logout button
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+    
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    // Navigation tabs
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            switchTab(e.target.dataset.tab);
+        });
+    });
+    
+    // Insights sub-navigation
+    document.querySelectorAll('.subnav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            switchSubtab(e.target.dataset.subtab);
+        });
+    });
+    
+    // Quick action buttons
+    document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            handleQuickAction(e.currentTarget.dataset.action);
+        });
+    });
+    
+    // Export buttons
+    document.querySelectorAll('.export-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const format = e.currentTarget.textContent.toLowerCase().includes('pdf') ? 'pdf' : 
+                          e.currentTarget.textContent.toLowerCase().includes('excel') ? 'excel' : 
+                          e.currentTarget.textContent.toLowerCase().includes('csv') ? 'csv' : 'powerpoint';
+            exportReport(format, 'General');
+        });
+    });
+    
+    // Report generation buttons
+    document.querySelectorAll('.report-card .btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const reportType = e.target.closest('.report-card').querySelector('h5').textContent;
+            exportReport('pdf', reportType);
+        });
+    });
+    
+    // Theme selection in settings
+    document.querySelectorAll('.theme-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            handleThemeChange(e.target.dataset.theme);
+        });
+    });
+};
+
+// Application Initialization
+const initializeApplication = () => {
+    console.log('Initializing Global IME Bank Enhanced Revenue Prediction System...');
+    
+    // Initialize theme
+    initializeTheme();
+    
+    // Setup event listeners
+    initializeEventListeners();
+    
+    // Initialize chat system
+    initializeChatSystem();
+
+    chatBox = document.getElementById('chatAssistant');
+    chatBox.classList.add('hidden');
+    
+    // Start loading sequence
+    startLoadingSequence();
+    
+    // Initialize default tab content
+    switchTab('dashboard');
+    
+    console.log('Application initialized successfully');
+};
+
+// DOM Content Loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initializeApplication();
+});
+
+// Window Load Event
+window.addEventListener('load', () => {
+    // Any additional initialization after all resources are loaded
+    console.log('All resources loaded');
+});
+
+// Handle window resize for responsive charts
+window.addEventListener('resize', () => {
+    Object.values(appState.charts).forEach(chart => {
+        if (chart && typeof chart.resize === 'function') {
+            chart.resize();
+        }
+    });
+});
+
+// Prevent form submission on enter key for certain inputs
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.type === 'text' && !e.target.closest('form')) {
+        e.preventDefault();
+    }
+});
+
+// Error handling for uncaught errors
+window.addEventListener('error', (e) => {
+    console.error('Application error:', e.error);
+    showNotification('An unexpected error occurred. Please refresh the page.', 'error');
+});
+
+// Service worker registration (if available)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+                console.log('SW registration failed: ', registrationError);
+            });
+    });
+}
+
+// Export global functions for potential external use
+window.GlobalIMEBank = {
+    switchTab,
+    switchSubtab,
+    toggleTheme,
+    showNotification,
+    formatCurrency,
+    formatNumber
+};
