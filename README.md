@@ -1,10 +1,11 @@
-## To run locally:
+# To run locally:
 
-# Add the following folders and files:
-1. *data* folder at backend/
-2. *modelsEachBranch* at backend/
-3. *unique_branch.csv* at backend/
+## Add the following folders and files:
+1. **data** folder at backend/
+2. **modelsEachBranch** at backend/
+3. **unique_branch.csv** at backend/
 
+## Run server and client
 
 1. Start server:
 ```
