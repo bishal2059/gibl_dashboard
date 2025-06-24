@@ -4,6 +4,7 @@
 1. **data** folder at backend/
 2. **modelsEachBranch** at backend/
 3. **unique_branch.csv** at backend/
+4. **.env** at backend/ with necessary API key as per .env.example
 
 ## Run server and client
 
