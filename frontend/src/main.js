@@ -13,7 +13,6 @@ let appState = {
 
 // Application Data
 const applicationData = {
-    
     kpis: {
         totalRevenue: 45200000,
         revenueGrowth: 8.3,
@@ -115,36 +114,6 @@ const applicationData = {
         ]
     },
     
-    chatResponses: [
-        {
-            trigger: "hello",
-            response: "Hello! I'm your Global IME Bank assistant. I can help you with revenue predictions, analytics insights, employee performance, and system navigation. What would you like to know?"
-        },
-        {
-            trigger: "revenue",
-            response: "Our advanced ML models analyze historical data, seasonal patterns, and economic indicators to predict revenue with 87% accuracy. You can generate predictions for up to 12 months ahead."
-        },
-        {
-            trigger: "prediction",
-            response: "To generate a revenue prediction, go to the Revenue Predictions tab, select your branch and time period, then click 'Generate Prediction'. The system will show detailed forecasts with confidence intervals."
-        },
-        {
-            trigger: "employee",
-            response: "The Employee Analytics section provides comprehensive performance metrics, training progress, and customer satisfaction scores. You can view individual and team performance data."
-        },
-        {
-            trigger: "insight",
-            response: "The Advanced Insights tab offers deep analytics across 5 areas: Overview, Trend Analysis, Regional Comparison, Advanced Forecasting, and Risk Analysis. Each provides detailed business intelligence."
-        },
-        {
-            trigger: "export",
-            response: "You can export reports in multiple formats (PDF, Excel, CSV, PowerPoint) from the Reports tab. All charts and data tables can be downloaded for presentations."
-        },
-        {
-            trigger: "theme",
-            response: "You can switch between light and dark themes using the toggle button in the header. Your preference will be saved for future sessions."
-        }
-    ]
 };
 
 // Utility Functions
@@ -590,24 +559,24 @@ const initializeChatSystem = () => {
     }
     
     // Send message function
-    const sendMessage = () => {
+    const sendMessage = async () => {
         const message = chatInput.value.trim();
         if (!message) return;
         
         addChatMessage(message, 'user');
         chatInput.value = '';
         
-        // Simulate typing indicator
-        setTimeout(() => {
-            const response = generateChatResponse(message);
-            addChatMessage(response, 'bot');
-        }, 1500);
+        // get chat response
+        const response = await generateChatResponse(message);
+        console.log('Chat response:', response);
+        addChatMessage(response, 'bot');
     };
     
     // Event listeners
     chatSend.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key == 'Enter') {
+            console.log('Enter key pressed, sending message');
             sendMessage();
         }
     });
@@ -635,43 +604,32 @@ const addChatMessage = (message, sender) => {
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 };
+const generateChatResponse = async (userMessage) => {
+    const qns = userMessage;
 
-const generateChatResponse = (userMessage) => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    // Find matching response
-    const matchingResponse = applicationData.chatResponses.find(response => 
-        lowerMessage.includes(response.trigger)
-    );
-    
-    if (matchingResponse) {
-        return matchingResponse.response;
+    try {
+        const response = await fetch('http://localhost:8000/api/chatbot/insights', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ question: qns })
+        });
+
+        const data = await response.json();
+
+        if (data.answer) {
+            return data.answer;
+        } else {
+            return "I'm sorry, I didn't understand that. Can you please rephrase?";
+        }
+
+    } catch (error) {
+        console.error('Error fetching chatbot response:', error);
+        return "I'm sorry, there was an error processing your request. Please try again later.";
     }
-    
-    // Contextual responses
-    if (lowerMessage.includes('branch') || lowerMessage.includes('location')) {
-        return `We have ${applicationData.branches.length} major branches in the system. You can select any branch for revenue predictions. Our top performing branches are in Kathmandu and Pokhara.`;
-    }
-    
-    if (lowerMessage.includes('performance') || lowerMessage.includes('employee')) {
-        return "Our Employee Analytics section shows comprehensive performance metrics. The average performance score across all employees is 4.3/5.0 with 98.5% target achievement rate.";
-    }
-    
-    if (lowerMessage.includes('kpi') || lowerMessage.includes('metric')) {
-        return "Key performance indicators show strong growth: 8.3% revenue increase, 12.5% customer growth, and 87% model accuracy for predictions.";
-    }
-    
-    if (lowerMessage.includes('risk') || lowerMessage.includes('compliance')) {
-        return "Our Risk Analysis section monitors key factors including interest rate volatility, regulatory changes, and cybersecurity threats. Current compliance status is excellent across all major frameworks.";
-    }
-    
-    if (lowerMessage.includes('report') || lowerMessage.includes('download')) {
-        return "You can generate and download reports in multiple formats from the Reports tab. Available formats include PDF, Excel, CSV, and PowerPoint presentations.";
-    }
-    
-    // Default response
-    return "I'm here to help with the Global IME Bank analytics platform. You can ask me about revenue predictions, employee performance, risk analysis, reports, or how to navigate the system. What specific information do you need?";
 };
+
 
 // Quick Actions
 const handleQuickAction = (action) => {
