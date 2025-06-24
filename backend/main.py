@@ -1,10 +1,12 @@
-from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from datetime import datetime
-from typing import List
-import csv
-import random
 from predict import get_prediction_of_branch_n
+from fastapi import FastAPI, HTTPException
+from chatbot import data_analysis_chat
+from datetime import datetime
+from pydantic import BaseModel
+from typing import List
+import random
+import csv
 
 app = FastAPI()
 
@@ -117,3 +119,16 @@ def get_branch_forecast(branch_Id: str, months: int = 6):
         raise HTTPException(status_code=404, detail="Branch not found")
     except FileNotFoundError:
         raise HTTPException(status_code=500, detail="CSV file not found")
+
+class ChatQuestion(BaseModel):
+    question: str
+
+@app.post("/api/chatbot/insights")
+def chat_response(qns: ChatQuestion):
+    """Handle chat questions for data analysis."""
+    print(qns.question)
+    try:
+        answer = data_analysis_chat(qns.question)
+        return {"answer": answer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
