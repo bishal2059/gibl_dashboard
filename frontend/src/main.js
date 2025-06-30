@@ -5,10 +5,18 @@ let appState = {
     selectedMonths: 0,
     currentTheme: 'light',
     activeTab: 'dashboard',
-    activeSubtab: 'overview',
+    activeSubtab: 'summary',
     charts: {},
     loadingComplete: false,
     chatExpanded: true
+};
+
+
+let appData = {
+    summaryCards: '',
+    analysisCards: '',
+    keyInsights: '',
+    followUpQuestions: ''
 };
 
 // Application Data
@@ -22,98 +30,7 @@ const applicationData = {
         customerGrowth: 12.5,
         overallGrowthRate: 12.8,
         growthIncrease: 2.1
-    },
-    
-    employees: [
-        {
-            id: "EMP001",
-            name: "राज कुमार शर्मा",
-            role: "Branch Manager",
-            branch: "Kathmandu Main",
-            performanceScore: 4.8,
-            targetsAchieved: 112,
-            customerSatisfaction: 4.6,
-            experience: 8
-        },
-        {
-            id: "EMP002",
-            name: "सीता देवी पौडेल",
-            role: "Loan Officer",
-            branch: "Pokhara",
-            performanceScore: 4.5,
-            targetsAchieved: 98,
-            customerSatisfaction: 4.4,
-            experience: 5
-        },
-        {
-            id: "EMP003",
-            name: "अमित श्रेष्ठ",
-            role: "Customer Officer",
-            branch: "Biratnagar",
-            performanceScore: 4.2,
-            targetsAchieved: 88,
-            customerSatisfaction: 4.2,
-            experience: 3
-        },
-        {
-            id: "EMP004",
-            name: "प्रिया गुरुङ",
-            role: "Credit Analyst",
-            branch: "Kathmandu Main",
-            performanceScore: 4.7,
-            targetsAchieved: 105,
-            customerSatisfaction: 4.5,
-            experience: 6
-        },
-        {
-            id: "EMP005",
-            name: "रामेश खत्री",
-            role: "Teller",
-            branch: "Pokhara",
-            performanceScore: 4.0,
-            targetsAchieved: 85,
-            customerSatisfaction: 4.1,
-            experience: 2
-        }
-    ],
-    
-    insights: {
-        keyFindings: [
-            "Revenue shows consistent growth trend with 6.2% average monthly increase",
-            "Digital banking adoption increasing revenue by 15% annually",
-            "Bagmati Province branches outperform national average by 12%",
-            "Customer acquisition cost reduced by 18% through digital channels",
-            "Mobile banking users contribute 45% of total fee income"
-        ],
-        recommendations: [
-            "Accelerate digital transformation initiatives in rural branches",
-            "Implement AI-powered customer service chatbots",
-            "Expand lending portfolio in high-growth sectors",
-            "Strengthen risk management frameworks",
-            "Invest in employee training for new financial products"
-        ],
-        riskFactors: [
-            {
-                name: "Interest Rate Volatility",
-                impact: "High",
-                probability: 65,
-                description: "Central bank policy changes may affect lending margins"
-            },
-            {
-                name: "Regulatory Changes",
-                impact: "Medium",
-                probability: 40,
-                description: "New compliance requirements may increase operational costs"
-            },
-            {
-                name: "Cybersecurity Threats",
-                impact: "High",
-                probability: 30,
-                description: "Digital transformation increases cyber risk exposure"
-            }
-        ]
-    },
-    
+    }
 };
 
 // Utility Functions
@@ -200,7 +117,7 @@ const switchTab = (tabId) => {
     
     // Initialize tab-specific content
     if (tabId === 'insights') {
-        switchSubtab('overview');
+        switchSubtab('summary');
     }
 };
 
@@ -244,7 +161,7 @@ const startLoadingSequence = () => {
     setTimeout(() => {
         appState.loadingComplete = true;
         showScreen('loginScreen');
-    }, 5000);
+    }, 1000);
 };
 
 const showScreen = (screenId) => {
@@ -281,7 +198,7 @@ const handleLogin = (e) => {
     if (!password) {
         showError('password', 'Password is required');
         isValid = false;
-    } else if (password.length < 6) {
+    } else if (password.length < 1) {
         showError('password', 'Password must be at least 6 characters');
         isValid = false;
     }
@@ -379,6 +296,23 @@ const handlePrediction = (e) => {
         .catch(error => {
             console.error('Error fetching branch data:', error);
             showNotification('Failed to fetch branch data', 'error');
+        });
+
+         // populate insights data
+        insights = document.getElementById('insightsTab');
+        insights.classList.remove('hidden');
+
+        //get sample data from api call
+        fetch('http://localhost:8000/api/current_insights/')
+        .then(response => response.json())
+        .then(sample_data => {
+               // Populate insights data
+               console.log('Sample insights data:', sample_data);
+               populateInsightsData(sample_data);
+        })
+        .catch(error => {
+            console.error('Error fetching insights data:', error);
+            showNotification('Failed to fetch insights data', 'error');
         });
 };
 
@@ -631,6 +565,99 @@ const generateChatResponse = async (userMessage) => {
 };
 
 
+//populate insights data
+const populateInsightsData = (insights) => {
+        appData.summaryCards = insights[0].subsections;
+        appData.analysisCards = insights[1].subsections;
+        appData.keyInsights = insights[2].subsections;
+        let followUpQuestions = insights[3]?.subsections;
+        qns = []
+        followUpQuestions.forEach(q => {
+            qns.push(q?.points);
+        });
+        appData.followUpQuestions = qns;
+
+        summaryCards();
+        loadAnalysisCards();
+        loadInsightCards();
+        loadFollowUpQuestions();
+        
+
+}
+
+function summaryCards() {
+    const summaryGrid = document.getElementById('summaryGrid');
+
+    summaryGrid.innerHTML = appData.summaryCards.map(card => `
+        <div class="card">
+            <div class="card__header">
+                <h3>${card.title}</h3>
+            </div>
+            <div class="card__body">
+                ${generate_p(card.points)}
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadAnalysisCards() {
+    const analysisGrid = document.getElementById('analysisGrid');
+
+    analysisGrid.innerHTML = appData.analysisCards.map(card => ` 
+        <div class="card">
+            <div class="card__header">
+                <h3> ${card.title}</h3>
+             </div>
+                    <div class="card__body">
+                    ${generate_p(card.points)}
+                    </div>
+        </div>
+        `).join('');
+       
+    }
+
+function generate_p(text) {
+    // generate p from each value in array
+    if (Array.isArray(text)) {
+        return text.map(item => `<p>${item}</p>`).join('');
+    }
+    // if not array, return as single p
+    return `<p>${text}</p>`;
+}
+
+options = ['low', 'medium', 'high'];
+
+function loadInsightCards() {
+    const insightsGrid = document.getElementById('insightsGrid');
+    
+    insightsGrid.innerHTML = appData.keyInsights.map(insight => `
+        <div class="insight-card">
+            <div class="insight-card__header">
+                <div class="insight-card__severity insight-card__severity--${options[Math.floor(Math.random() * options.length)]}"></div>
+                <h3 class="insight-card__title">${insight.title.substr(insight.title.indexOf(':')+1)}</h3>
+            </div>
+            <p class="insight-card__description">${insight.points[0]}</p>
+            <div class="insight-card__recommendation">
+                <strong>Recommendation:</strong> ${insight.points[1]}
+            </div>
+        </div>
+    `).join('');
+}
+
+
+function loadFollowUpQuestions() {
+    const questionsList = document.getElementById('questionsList');
+    
+    questionsList.innerHTML = appData.followUpQuestions.map((question, index) => `
+        <div class="question-item" data-question="${index}">
+            <p class="question-item__text">${question}</p>
+        </div>
+    `).join('');
+}
+
+
+
+
 // Quick Actions
 const handleQuickAction = (action) => {
     switch (action) {
@@ -641,8 +668,6 @@ const handleQuickAction = (action) => {
         case 'insights':
             switchTab('insights');
             break;
-        case 'employee':
-            switchTab('employee');
             break;
         case 'reports':
             switchTab('reports');
@@ -763,6 +788,9 @@ const initializeApplication = () => {
     
     // Initialize default tab content
     switchTab('dashboard');
+
+    insights = document.getElementById('insightsTab');
+    insights.classList.add('hidden');
     
     console.log('Application initialized successfully');
 };
