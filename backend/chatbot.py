@@ -294,11 +294,6 @@ def intelligent_chatbot_response(question):
 
 def data_analysis_chat(question: str, chatHistory=None):
     """Main chat loop"""
-    # print("🏦 Welcome to the Dynamic Banking Data Chatbot!")
-    # print("=" * 60)
-    # print("This chatbot uses AI to generate custom code for each question.")
-    # print("All currency amounts are displayed in NPR (Nepalese Rupees).")
-    # print("\nAvailable data:")
     for name, df in dataframes.items():
         print(f"• {name}: {len(df)} records")
 

@@ -2,6 +2,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from predict import get_prediction_of_branch_n
 from fastapi import FastAPI, HTTPException
 from chatbot import data_analysis_chat
+from chatbot import generate_insights
+from parseReadme import parse_readme_to_json
 from datetime import datetime
 from pydantic import BaseModel
 from typing import List
@@ -24,6 +26,8 @@ app.add_middleware(
     allow_headers=["*"],               # allow all headers
 )
 
+
+server_data = {}
 
 @app.get("/")
 def read_root():
@@ -88,6 +92,19 @@ def get_branch_forecast(branch_Id: str, months: int = 6):
                     }
                     break
             months_hist, actual_hist, future_months, future_preds = get_prediction_of_branch_n(data["name"], months)
+
+            #save data in server for future requests
+            server_data = {
+                "branch_id": branch_Id,
+                "branch_name": data["name"],
+                "location": data["location"],
+                "province": data["province"],
+                "months_hist": months_hist,
+                "actual_hist": actual_hist,
+                "future_months": future_months,
+                "future_preds": future_preds
+            }
+
             # Format historical revenue
             historical_growths = calculate_growth(actual_hist)
             historicalRevenue_raw = [
@@ -132,3 +149,17 @@ def chat_response(qns: ChatQuestion):
         return {"answer": answer}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/current_insights")
+def get_current_insights():
+    """Generate and return current insights."""
+    try:
+        insights = generate_insights(server_data.get('months_hist', []),
+                                     server_data.get('actual_hist', []),
+                                     server_data.get('future_months', []),
+                                     server_data.get('future_preds', []))
+        print(insights)
+        return parse_readme_to_json(insights)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) 
