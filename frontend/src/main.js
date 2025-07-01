@@ -1,3 +1,5 @@
+import removeMarkdown from './removeMarkdownWrapper';
+
 // Global Application State
 let appState = {
     currentUser: '',
@@ -211,7 +213,7 @@ const handleLogin = (e) => {
         }
         showScreen('mainScreen');
         showNotification(`Welcome back, ${username}!`, 'success');
-        chatBox = document.getElementById('chatAssistant');
+        const chatBox = document.getElementById('chatAssistant');
         chatBox.classList.remove('hidden');
     }
 };
@@ -487,7 +489,7 @@ const initializeChatSystem = () => {
         
         // get chat response
         const response = await generateChatResponse(message);
-        console.log('Chat response:', response);
+        // console.log('Chat response:', response);
         addChatMessage(response, 'bot');
     };
     
@@ -495,7 +497,7 @@ const initializeChatSystem = () => {
     chatSend.addEventListener('click', sendMessage);
     chatInput.addEventListener('keydown', (e) => {
         if (e.key == 'Enter') {
-            console.log('Enter key pressed, sending message');
+            // console.log('Enter key pressed, sending message');
             sendMessage();
         }
     });
@@ -538,7 +540,7 @@ const generateChatResponse = async (userMessage) => {
         const data = await response.json();
 
         if (data.answer) {
-            return data.answer;
+            return removeMarkdown(data.answer);
         } else {
             return "I'm sorry, I didn't understand that. Can you please rephrase?";
         }
@@ -556,9 +558,9 @@ function fetchInsightsData(branch_Id) {
         .then(response => response.json())
         .then(sample_data => {
                // Populate insights data
-               console.log('Sample insights data:', sample_data); // comment this line to hide sample data in console
+            //    console.log('Sample insights data:', sample_data); // comment this line to hide sample data in console
             // populate insights data
-            insights = document.getElementById('insightsTab');
+            const insights = document.getElementById('insightsTab');
             insights.classList.remove('hidden');
             clearChat();
             populateInsightsData(sample_data);
@@ -628,7 +630,7 @@ function generate_p(text) {
     }
 }
 
-options = ['low', 'medium', 'high'];
+const options = ['low', 'medium', 'high'];
 
 function loadInsightCards() {
     const insightsGrid = document.getElementById('insightsGrid');
@@ -783,7 +785,7 @@ const initializeApplication = () => {
     // Initialize chat system
     initializeChatSystem();
 
-    chatBox = document.getElementById('chatAssistant');
+    const chatBox = document.getElementById('chatAssistant');
     chatBox.classList.add('hidden');
     
     // Start loading sequence
@@ -792,7 +794,7 @@ const initializeApplication = () => {
     // Initialize default tab content
     switchTab('dashboard');
 
-    insights = document.getElementById('insightsTab');
+    const insights = document.getElementById('insightsTab');
     insights.classList.add('hidden');
     
     console.log('Application initialized successfully');
@@ -915,10 +917,10 @@ async function makeApiCall(userMessage) {
         hideTypingIndicator();
         
         // Add bot response
-        if (data.response) {
-            addMessage(data.response, 'bot');
-        } else if (data.message) {
-            addMessage(data.message, 'bot');
+        if (data.message) {
+            const messageText = removeMarkdown(data.message);
+            addMessage(messageText, 'bot');
+
         } else {
             addMessage('I apologize, but I received an empty response. Please try again.', 'bot');
         }
