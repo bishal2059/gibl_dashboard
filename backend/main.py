@@ -3,10 +3,13 @@ from predict import get_prediction_of_branch_n
 from fastapi import FastAPI, HTTPException
 from chatbot import data_analysis_chat
 from chatbot import generate_insights
-from parseReadme import parse_readme_to_json
+from parseToJson import extract_insights_json
 from datetime import datetime
 from pydantic import BaseModel
 from typing import List
+from chatbot import generate_followup_resposne
+import json
+from pathlib import Path
 import random
 import csv
 
@@ -27,7 +30,19 @@ app.add_middleware(
 )
 
 
-server_data = {}
+DATA_FILE = Path("data_store.json")
+
+
+def save_dict(data: dict):
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f)
+
+
+def load_dict() -> dict:
+    if DATA_FILE.exists():
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    return {}
 
 @app.get("/")
 def read_root():
@@ -93,17 +108,16 @@ def get_branch_forecast(branch_Id: str, months: int = 6):
                     break
             months_hist, actual_hist, future_months, future_preds = get_prediction_of_branch_n(data["name"], months)
 
-            #save data in server for future requests
+            #save data into file
+            user_id = f"user_{branch_Id}"
             server_data = {
-                "branch_id": branch_Id,
-                "branch_name": data["name"],
-                "location": data["location"],
-                "province": data["province"],
                 "months_hist": months_hist,
                 "actual_hist": actual_hist,
                 "future_months": future_months,
                 "future_preds": future_preds
             }
+            save_dict({user_id: server_data})
+            
 
             # Format historical revenue
             historical_growths = calculate_growth(actual_hist)
@@ -143,7 +157,7 @@ class ChatQuestion(BaseModel):
 @app.post("/api/chatbot/insights")
 def chat_response(qns: ChatQuestion):
     """Handle chat questions for data analysis."""
-    print(qns.question)
+    # print(qns.question)
     try:
         answer = data_analysis_chat(qns.question)
         return {"answer": answer}
@@ -151,15 +165,53 @@ def chat_response(qns: ChatQuestion):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/current_insights")
-def get_current_insights():
+@app.get("/api/current_insights/{branch_Id}")
+def get_current_insights(branch_Id: str):
     """Generate and return current insights."""
     try:
+        #get data from redis
+        print(f"Fetching insights for branch: {branch_Id}")
+        user_id = f"user_{branch_Id}"
+        data = load_dict().get(user_id, {})
+        if not data:
+            raise HTTPException(status_code=404, detail="No data found for this branch")
+        
+        server_data = data
+
         insights = generate_insights(server_data.get('months_hist', []),
                                      server_data.get('actual_hist', []),
                                      server_data.get('future_months', []),
                                      server_data.get('future_preds', []))
-        print(insights)
-        return parse_readme_to_json(insights)
+        # print(insights)
+        return extract_insights_json(insights)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) 
+
+class ChatInsightQuestion(BaseModel):
+    question: str
+    branchId: str
+
+@app.post("/api/chat_insights")
+def chat_insights(qns: ChatInsightQuestion):
+    """Handle chat questions for insights."""
+    try:
+        # Extract branch ID from the question
+        branch_id = qns.branchId
+        if not branch_id:
+            raise HTTPException(status_code=400, detail="Branch ID is required")
+        # Get the data for the specific branch
+        user_id = f"user_{branch_id}"
+        data = load_dict().get(user_id, {})
+        if not data:
+            raise HTTPException(status_code=404, detail="No data found for this branch")
+        # Call the chat function with the question and data
+        answer = generate_followup_resposne(qns.question, data.get('months_hist', []),
+                                            data.get('actual_hist', []),
+                                            data.get('future_months', []),
+                                            data.get('future_preds', []))
+        if not answer:
+            raise HTTPException(status_code=404, detail="No insights found for this question")
+        # Return the answer
+        return {"message": answer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -373,7 +373,26 @@ def generate_insights(months_hist, actual_hist, future_months, future_preds):
 
         Note: All currency amounts are displayed in NPR (Nepalese Rupees).
         
-        Format the response with clear sections and bullet points. Focus on actionable insights for banking operations.
+        Format the response with clear sections, subsections and title, points in a json format with sections: 
+        {{
+            "summary": {{
+                "some title": ["Point1", "Point 2", ...,"summary of the data and predictions"],
+                "another title": ["Point 1", "Point 2", ...]
+            }}
+            "analysis": {{
+                "some title": ["Point1", "Point 2", ..., "detailed analysis of the data and predictions"],
+                "another title": ["Point 1", "Point 2", ...]
+            }},
+            "insights_and_recommendations": {{
+                "some title": {{
+                    "points": "insight text here",
+                    "recommendations": "recommendation text here"
+                }},
+                ...
+            }},
+            "suggested_follow_up_questions": ["Question 1", "Question 2", ...]
+        }}
+        Focus on actionable insights for banking operations.
         
         At the end, include a section called "Suggested Follow-up Questions" with 3-5 specific questions that users could ask to dive deeper into the analysis, such as:
         - "What factors are driving the predicted growth trend?"
@@ -479,56 +498,19 @@ def handle_followup_question(question, months_hist, actual_hist, future_months, 
     except Exception as e:
         return f"Error processing follow-up question: {str(e)}"
 
-def interactive_insights_session(months_hist, actual_hist, future_months, future_preds):
+def generate_followup_resposne(question, months_hist, actual_hist, future_months, future_preds):
     """
-    Interactive session for generating insights and handling follow-up questions
+    Generate a response to a follow-up question based on the prediction results and available data
     
     Args:
+        question: User's follow-up question
         months_hist: Historical months
         actual_hist: Historical actual values
         future_months: Future months for prediction
         future_preds: Predicted values for future months
+        dataframes: Available dataframes for additional context
+    
+    Returns:
+        str: AI-generated response to the follow-up question
     """
-    print("🔍 Generating initial insights...")
-    initial_insights = generate_insights(months_hist, actual_hist, future_months, future_preds)
-    print(initial_insights)
-    
-    print("\n" + "=" * 60)
-    print("💬 **Interactive Follow-up Session**")
-    print("Ask follow-up questions to dive deeper into the analysis!")
-    print("Type 'done' to exit the session")
-    print("=" * 60)
-    
-    while True:
-        try:
-            followup_question = input("\n❓ Your follow-up question: ").strip()
-            
-            if followup_question.lower() in ['done', 'exit', 'quit', '']:
-                print("👋 Ending insights session. Thank you!")
-                break
-            
-            print("\n🤖 Processing your follow-up question...")
-            followup_response = handle_followup_question(
-                followup_question, 
-                months_hist, 
-                actual_hist, 
-                future_months, 
-                future_preds, 
-                dataframes
-            )
-            print(f"\n{followup_response}")
-            
-        except KeyboardInterrupt:
-            print("\n\n👋 Ending insights session. Goodbye!")
-            break
-        except Exception as e:
-            print(f"\n❌ Error: {str(e)}")
-
-# Interactive_insights_session(
-#     months_hist=['2023-01', '2023-02', '2023-03'],
-#     actual_hist=[100000, 120000, 110000],
-#     future_months=['2023-04', '2023-05', '2023-06'],
-#     future_preds=[130000, 140000, 150000]
-# )
-# Uncomment the above line to start an interactive insights session with sample data
-# Note: Replace the sample data with actual historical and predicted values from predict.py.  
+    return handle_followup_question(question, months_hist, actual_hist, future_months, future_preds, dataframes)
