@@ -187,10 +187,6 @@
                                     <i class="fas fa-chart-pie"></i>
                                     <span>View Insights</span>
                                 </button>
-                                <button class="action-btn" data-action="employee">
-                                    <i class="fas fa-user-tie"></i>
-                                    <span>Employee Stats</span>
-                                </button>
                                 <button class="action-btn" data-action="reports">
                                     <i class="fas fa-download"></i>
                                     <span>Export Report</span>
@@ -487,6 +483,33 @@
 
                     <!-- chatbot Sub-tab -->
                     <div id="chatbotSubtab" class="subtab-content">
+                    <div id="centralChatInterface" class="central-chat-interface">
+                            <div class="main-chat-header" id="mainChatHeader">
+                                <div class="header-title">
+                                    <i class="fas fa-robot"></i>
+                                    <span>Global IME Bank Analytics Assistant</span>
+                                </div>
+                            </div>
+                            <div class="main-chat-body" id="mainChatBody">
+                                <div class="chat-message-area" id="chatMessageArea">
+                                    <div class="banking-message bot-banking-message">
+                                        <div class="banking-message-avatar">
+                                            <i class="fas fa-robot"></i>
+                                        </div>
+                                        <div class="banking-message-content">
+                                            <p>Hello! I'm your Global IME Bank Prediction Analysis Chatbox. Let me help you with analyzing your forcast and preditive analysis.</p>
+                                            <span class="banking-message-time">Now</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="main-input-section">
+                                    <input type="text" id="mainChatInput" class="main-chat-input" placeholder="Ask me anything about Global IME Bank analytics...">
+                                    <button id="mainChatSend" class="main-chat-send">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                        
                     </div>
                 </div>

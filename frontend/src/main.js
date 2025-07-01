@@ -161,7 +161,7 @@ const startLoadingSequence = () => {
     setTimeout(() => {
         appState.loadingComplete = true;
         showScreen('loginScreen');
-    }, 1000);
+    }, 4000);
 };
 
 const showScreen = (screenId) => {
@@ -198,8 +198,8 @@ const handleLogin = (e) => {
     if (!password) {
         showError('password', 'Password is required');
         isValid = false;
-    } else if (password.length < 1) {
-        showError('password', 'Password must be at least 6 characters');
+    } else if (password.length < 4) {
+        showError('password', 'Password must be at least 4 characters');
         isValid = false;
     }
     
@@ -296,23 +296,8 @@ const handlePrediction = (e) => {
         .catch(error => {
             console.error('Error fetching branch data:', error);
             showNotification('Failed to fetch branch data', 'error');
-        });
-
-         // populate insights data
-        insights = document.getElementById('insightsTab');
-        insights.classList.remove('hidden');
-
-        //get sample data from api call
-        fetch('http://localhost:8000/api/current_insights/')
-        .then(response => response.json())
-        .then(sample_data => {
-               // Populate insights data
-               console.log('Sample insights data:', sample_data);
-               populateInsightsData(sample_data);
-        })
-        .catch(error => {
-            console.error('Error fetching insights data:', error);
-            showNotification('Failed to fetch insights data', 'error');
+        }).finally(() =>{
+            fetchInsightsData(branchId);
         });
 };
 
@@ -564,18 +549,34 @@ const generateChatResponse = async (userMessage) => {
     }
 };
 
+// insights data api call function
+function fetchInsightsData(branch_Id) {
+        //get sample data from api call
+        fetch(`http://localhost:8000/api/current_insights/${branch_Id}`)
+        .then(response => response.json())
+        .then(sample_data => {
+               // Populate insights data
+               console.log('Sample insights data:', sample_data); // comment this line to hide sample data in console
+            // populate insights data
+            insights = document.getElementById('insightsTab');
+            insights.classList.remove('hidden');
+            clearChat();
+            populateInsightsData(sample_data);
+            showNotification('Insights generated successfully', 'success');
+        })
+        .catch(error => {
+            console.error('Error fetching insights data:', error);
+            showNotification('Failed to fetch insights data', 'error');
+        });
+}
 
 //populate insights data
 const populateInsightsData = (insights) => {
-        appData.summaryCards = insights[0].subsections;
-        appData.analysisCards = insights[1].subsections;
-        appData.keyInsights = insights[2].subsections;
-        let followUpQuestions = insights[3]?.subsections;
-        qns = []
-        followUpQuestions.forEach(q => {
-            qns.push(q?.points);
-        });
-        appData.followUpQuestions = qns;
+        appData.summaryCards = insights["summary"];
+        appData.analysisCards = insights["analysis"];
+        appData.keyInsights = insights["insights_and_recommendations"];
+        appData.followUpQuestions = insights["suggested_follow_up_questions"];
+ 
 
         summaryCards();
         loadAnalysisCards();
@@ -588,41 +589,43 @@ const populateInsightsData = (insights) => {
 function summaryCards() {
     const summaryGrid = document.getElementById('summaryGrid');
 
-    summaryGrid.innerHTML = appData.summaryCards.map(card => `
-        <div class="card">
+    summaryGrid.innerHTML = Object.entries(appData.summaryCards).map(([key,value]) => {
+        return `<div class="card">
             <div class="card__header">
-                <h3>${card.title}</h3>
+                <h3> ${key}</h3>
             </div>
             <div class="card__body">
-                ${generate_p(card.points)}
+            <ul class="summary-list">
+                ${generate_p(value)}
+            </ul>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function loadAnalysisCards() {
     const analysisGrid = document.getElementById('analysisGrid');
 
-    analysisGrid.innerHTML = appData.analysisCards.map(card => ` 
-        <div class="card">
+    analysisGrid.innerHTML = Object.entries(appData.analysisCards).map(([key,value]) => {
+        return `<div class="card">
             <div class="card__header">
-                <h3> ${card.title}</h3>
-             </div>
-                    <div class="card__body">
-                    ${generate_p(card.points)}
-                    </div>
+                <h3> ${key}</h3>
+            </div>
+            <div class="card__body">
+                ${generate_p(value)}
+            </div>
         </div>
-        `).join('');
+    `}).join('');
        
     }
 
 function generate_p(text) {
     // generate p from each value in array
     if (Array.isArray(text)) {
-        return text.map(item => `<p>${item}</p>`).join('');
+        return text.map(item => `<li>${item}</li>`).join('');
+    } else {
+        return `<li>${text}</li>`;
     }
-    // if not array, return as single p
-    return `<p>${text}</p>`;
 }
 
 options = ['low', 'medium', 'high'];
@@ -630,15 +633,15 @@ options = ['low', 'medium', 'high'];
 function loadInsightCards() {
     const insightsGrid = document.getElementById('insightsGrid');
     
-    insightsGrid.innerHTML = appData.keyInsights.map(insight => `
+    insightsGrid.innerHTML = Object.entries(appData.keyInsights).map(([key, value]) => `
         <div class="insight-card">
             <div class="insight-card__header">
                 <div class="insight-card__severity insight-card__severity--${options[Math.floor(Math.random() * options.length)]}"></div>
-                <h3 class="insight-card__title">${insight.title.substr(insight.title.indexOf(':')+1)}</h3>
+                <h3 class="insight-card__title">${key}</h3>
             </div>
-            <p class="insight-card__description">${insight.points[0]}</p>
+            <p class="insight-card__description">${value["points"] || value["insights"] || value["insight"]}</p>
             <div class="insight-card__recommendation">
-                <strong>Recommendation:</strong> ${insight.points[1]}
+                <strong>Recommendation:</strong> ${value["recommendations"]}
             </div>
         </div>
     `).join('');
@@ -841,6 +844,218 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// Insight chat box handling function
+
+// Global IME Bank Analytics Chat Assistant - Function-based implementation
+let isTyping = false;
+let messageArea, chatInput, sendButton;
+
+// Initialize chat interface
+function initializeBankingChat() {
+    messageArea = document.getElementById('chatMessageArea');
+    chatInput = document.getElementById('mainChatInput');
+    sendButton = document.getElementById('mainChatSend');
+    
+    setupEventListeners();
+    chatInput.focus();
+}
+
+// Setup event listeners
+function setupEventListeners() {
+    // Send button click
+    sendButton.addEventListener('click', sendMessage);
+    
+    // Enter key press
+    chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+}
+
+// Send message function
+function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message || isTyping) return;
+
+    // Add user message to chat
+    addMessage(message, 'user');
+    chatInput.value = '';
+
+    // Show typing indicator
+    showTypingIndicator();
+
+    // Make API call
+    makeApiCall(message);
+}
+
+// Make API call to get response
+async function makeApiCall(userMessage) {
+    try {
+        // Replace with your actual API endpoint
+        const response = await fetch('http://localhost:8000/api/chat_insights', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                question: userMessage,
+                branchId: appState.selectedBranch ? appState.selectedBranch.id : null,
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        // Hide typing indicator
+        hideTypingIndicator();
+        
+        // Add bot response
+        if (data.response) {
+            addMessage(data.response, 'bot');
+        } else if (data.message) {
+            addMessage(data.message, 'bot');
+        } else {
+            addMessage('I apologize, but I received an empty response. Please try again.', 'bot');
+        }
+
+    } catch (error) {
+        // Hide typing indicator
+        hideTypingIndicator();
+        
+        // Handle error response
+        handleErrorResponse(error);
+    }
+}
+
+// Handle API error responses
+function handleErrorResponse(error) {
+    let errorMessage = 'I apologize, but I encountered an issue while processing your request. ';
+    
+    if (error.message.includes('Failed to fetch')) {
+        errorMessage += 'Please check your internet connection and try again.';
+    } else if (error.message.includes('500')) {
+        errorMessage += 'Our analytics server is temporarily unavailable. Please try again in a moment.';
+    } else if (error.message.includes('404')) {
+        errorMessage += 'The chat service is temporarily unavailable. Please contact Global IME Bank support if this persists.';
+    } else if (error.message.includes('401') || error.message.includes('403')) {
+        errorMessage += 'Authentication required. Please refresh the page and try again.';
+    } else if (error.message.includes('429')) {
+        errorMessage += 'Too many requests. Please wait a moment before trying again.';
+    } else if (error.message.includes('timeout')) {
+        errorMessage += 'Request timed out. Please try again with a shorter message.';
+    } else {
+        errorMessage += `Error: ${error.message}`;
+    }
+    
+    addMessage(errorMessage, 'bot');
+    
+    // Log error for debugging (remove in production)
+    console.error('Chat API Error:', error);
+}
+
+// Add message to chat area
+function addMessage(text, sender) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `banking-message ${sender}-banking-message`;
+    
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    const avatarIcon = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+    
+    messageDiv.innerHTML = `
+        <div class="banking-message-avatar">
+            ${avatarIcon}
+        </div>
+        <div class="banking-message-content">
+            <p>${escapeHtml(text)}</p>
+            <span class="banking-message-time">${timeString}</span>
+        </div>
+    `;
+    
+    messageArea.appendChild(messageDiv);
+    scrollToBottom();
+}
+
+// Show typing indicator
+function showTypingIndicator() {
+    if (isTyping) return;
+    
+    isTyping = true;
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'banking-message bot-banking-message';
+    typingDiv.id = 'typingIndicator';
+    
+    typingDiv.innerHTML = `
+        <div class="banking-message-avatar">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="banking-message-content">
+            <p><em>Analyzing your query...</em></p>
+        </div>
+    `;
+    
+    messageArea.appendChild(typingDiv);
+    scrollToBottom();
+}
+
+// Hide typing indicator
+function hideTypingIndicator() {
+    const typingIndicator = document.getElementById('typingIndicator');
+    if (typingIndicator) {
+        typingIndicator.remove();
+    }
+    isTyping = false;
+}
+
+// Scroll to bottom of chat
+function scrollToBottom() {
+    setTimeout(function() {
+        messageArea.scrollTop = messageArea.scrollHeight;
+    }, 100);
+}
+
+// Utility function to escape HTML (security)
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Optional: Add retry functionality
+function retryLastMessage() {
+    const userMessages = messageArea.querySelectorAll('.user-banking-message');
+    if (userMessages.length > 0) {
+        const lastUserMessage = userMessages[userMessages.length - 1];
+        const messageText = lastUserMessage.querySelector('.banking-message-content p').textContent;
+        
+        showTypingIndicator();
+        makeApiCall(messageText);
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeBankingChat();
+    console.log('Global IME Bank Analytics Chat initialized');
+});
+
+
+function clearChat() {
+    const messageArea = document.getElementById('chatMessageArea');
+    if (messageArea) {
+        messageArea.innerHTML = ''; // Remove all child message elements
+        // Optionally, add a default welcome message after clearing
+        addMessage('Hello! I am your Global IME Bank Prediction Analysis Chatbox. Let me help you with analyzing your forcast and preditive analysis.', 'bot');
+    }
+}
+
+
 // Export global functions for potential external use
 window.GlobalIMEBank = {
     switchTab,
@@ -850,3 +1065,4 @@ window.GlobalIMEBank = {
     formatCurrency,
     formatNumber
 };
+
