@@ -215,3 +215,23 @@ def chat_insights(qns: ChatInsightQuestion):
         return {"message": answer}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.get("/api/kpi")
+def get_kpi_values():
+    # retrieve KPI values from the database or any other source
+    data = {
+            "total_revenue": "NPR 45.2M",
+            "total_revenue_change": "+8.3%",
+            "active_branches": "125",
+            "active_branches_change": "+5",
+            "total_customers": "1.2M",
+            "total_customers_change": "+12.5%",
+            "growth_rate": "12.8%",
+            "growth_rate_change": "-2.1%"
+            }
+    try:
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching KPI values: {str(e)}")
+    

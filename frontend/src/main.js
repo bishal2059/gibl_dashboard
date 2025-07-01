@@ -121,6 +121,59 @@ const switchSubtab = (subtabId) => {
     });
 };
 
+// Load KPI Data
+async function updateKPIValues() {
+    try {
+        const response = await fetch('http://localhost:8000/api/kpi'); 
+        const data = await response.json();
+
+        const kpis = [
+            {
+                selector: '.kpi-card:nth-child(1)',
+                value: data.total_revenue,
+                change: data.total_revenue_change
+            },
+            {
+                selector: '.kpi-card:nth-child(2)',
+                value: data.active_branches,
+                change: data.active_branches_change
+            },
+            {
+                selector: '.kpi-card:nth-child(3)',
+                value: data.total_customers,
+                change: data.total_customers_change
+            },
+            {
+                selector: '.kpi-card:nth-child(4)',
+                value: data.growth_rate,
+                change: data.growth_rate_change
+            }
+        ];
+
+        kpis.forEach(kpi => {
+            const card = document.querySelector(kpi.selector);
+            if (card) {
+                const valueEl = card.querySelector('.kpi-value');
+                const changeEl = card.querySelector('.kpi-change');
+
+                if (valueEl) valueEl.textContent = kpi.value;
+                if (changeEl) changeEl.textContent = kpi.change;
+
+                if (changeEl && kpi.change.startsWith('-')) {
+                    changeEl.classList.remove('positive');
+                    changeEl.classList.add('negative');
+                } else if (changeEl) {
+                    changeEl.classList.remove('negative');
+                    changeEl.classList.add('positive');
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching KPI data:', error);
+    }
+}
+
 // Loading Screen Management
 const startLoadingSequence = () => {
     const loadingTexts = [
@@ -815,6 +868,9 @@ const initializeApplication = () => {
     
     // Initialize theme
     initializeTheme();
+
+    //load kpi
+    updateKPIValues();
     
     // Setup event listeners
     initializeEventListeners();
