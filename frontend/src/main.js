@@ -1,4 +1,6 @@
 import { marked } from 'marked';
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 // Global Application State
 let appState = {
@@ -10,7 +12,7 @@ let appState = {
     activeSubtab: 'summary',
     charts: {},
     loadingComplete: false,
-    chatExpanded: true
+    chatExpanded: true,
 };
 
 
@@ -19,20 +21,6 @@ let appData = {
     analysisCards: '',
     keyInsights: '',
     followUpQuestions: ''
-};
-
-// Application Data
-const applicationData = {
-    kpis: {
-        totalRevenue: 45200000,
-        revenueGrowth: 8.3,
-        activeBranches: 125,
-        newBranches: 5,
-        totalCustomers: 1200000,
-        customerGrowth: 12.5,
-        overallGrowthRate: 12.8,
-        growthIncrease: 2.1
-    }
 };
 
 // Utility Functions
@@ -67,10 +55,6 @@ const showNotification = (message, type = 'success') => {
     setTimeout(() => {
         notification.remove();
     }, 5000);
-};
-
-const generateId = () => {
-    return Math.random().toString(36).substr(2, 9);
 };
 
 // Theme Management
@@ -240,7 +224,7 @@ const handleLogout = () => {
         error.classList.remove('show');
     });
 
-     chatBox = document.getElementById('chatAssistant');
+     const chatBox = document.getElementById('chatAssistant');
      chatBox.classList.add('hidden');
     
     showScreen('loginScreen');
@@ -305,7 +289,6 @@ const handlePrediction = (e) => {
 
 const generatePredictionResults = () => {
     if (!appState.selectedBranch) return;
-    
     // Update results header
     const resultsTitle = document.getElementById('resultsTitle');
     const selectedBranchName = document.getElementById('selectedBranchName');
@@ -660,9 +643,6 @@ function loadFollowUpQuestions() {
     `).join('');
 }
 
-
-
-
 // Quick Actions
 const handleQuickAction = (action) => {
     switch (action) {
@@ -683,13 +663,77 @@ const handleQuickAction = (action) => {
 };
 
 // Export Functions
-const exportReport = (format, reportType) => {
-    showNotification(`Generating ${reportType} report in ${format.toUpperCase()} format...`, 'success');
-    
-    // Simulate export process
-    setTimeout(() => {
-        showNotification(`${reportType} report downloaded successfully!`, 'success');
-    }, 2000);
+const exportReport = (data, format, reportType) => {
+  // Validate
+  if (!data || Object.keys(data).length === 0) {
+    showNotification(`No data available to export. Select branch to predict`, "error");
+    return;
+  }
+  if (format.toLowerCase() !== "pdf") {
+    showNotification(`Format ${format} not supported.`, "error");
+    return;
+  }
+
+  showNotification(`Generating ${reportType} report in PDF format...`, "success");
+
+  // Create the PDF
+  const doc = new jsPDF({ unit: "pt", format: "letter" });
+  const margin = 40;
+  let y = margin;
+
+  // Header
+  doc.setFontSize(18).text(`${reportType} Report`, margin, y);
+  y += 30;
+  doc.setFontSize(12);
+  doc.text(`Branch ID: ${data.id}`, margin, y);
+  y += 16;
+  doc.text(`Name     : ${data.name}`, margin, y);
+  y += 16;
+  doc.text(`Location : ${data.location}, ${data.province}`, margin, y);
+  y += 24;
+
+  // Historical Revenue
+  doc.setFontSize(14).text("Historical Revenue", margin, y);
+  y += 6;
+  autoTable(doc, {
+    startY: y,
+    head: [["Month", "Revenue", "Growth (%)"]],
+    body: data.historicalRevenue.map((r) => [
+      r.month,
+      r.revenue.toLocaleString(),
+      r.growth,
+    ]),
+    theme: "grid",
+    headStyles: { fillColor: [22, 160, 133] },
+    styles: { fontSize: 10 },
+    margin: { left: margin, right: margin },
+  });
+  y = doc.lastAutoTable.finalY + 20;
+
+  // Predicted Revenue
+  doc.setFontSize(14).text("Predicted Revenue", margin, y);
+  y += 6;
+  autoTable(doc, {
+    startY: y,
+    head: [["Month", "Revenue", "Growth (%)", "Confidence (%)"]],
+    body: data.predictedRevenue.map((r) => [
+      r.month,
+      r.revenue.toLocaleString(),
+      r.growth,
+      r.confidence.toFixed(1),
+    ]),
+    theme: "grid",
+    headStyles: { fillColor: [52, 73, 94] },
+    styles: { fontSize: 10 },
+    margin: { left: margin, right: margin },
+  });
+
+  // Save & Notify
+  setTimeout(() => {
+    const filename = `${data.id}_${reportType.replace(/\s+/g, "_")}.pdf`;
+    doc.save(filename);
+    showNotification(`${reportType} report downloaded successfully!`, "success");
+  }, 500);
 };
 
 // Settings Management
@@ -746,21 +790,14 @@ const initializeEventListeners = () => {
         });
     });
     
-    // Export buttons
-    document.querySelectorAll('.export-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const format = e.currentTarget.textContent.toLowerCase().includes('pdf') ? 'pdf' : 
-                          e.currentTarget.textContent.toLowerCase().includes('excel') ? 'excel' : 
-                          e.currentTarget.textContent.toLowerCase().includes('csv') ? 'csv' : 'powerpoint';
-            exportReport(format, 'General');
-        });
-    });
     
     // Report generation buttons
     document.querySelectorAll('.report-card .btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const reportType = e.target.closest('.report-card').querySelector('h5').textContent;
-            exportReport('pdf', reportType);
+            if (reportType === "Revenue Analysis Report"){
+                exportReport(appState.selectedBranch,'pdf', reportType);
+            }    
         });
     });
     
@@ -1036,7 +1073,6 @@ function clearChat() {
         addMessage('Hello! I am your Global IME Bank Prediction Analysis Chatbox. Let me help you with analyzing your forcast and preditive analysis.', 'bot');
     }
 }
-
 
 // Export global functions for potential external use
 window.GlobalIMEBank = {
