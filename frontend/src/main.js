@@ -1,4 +1,4 @@
-import removeMarkdown from './removeMarkdownWrapper';
+import { marked } from 'marked';
 
 // Global Application State
 let appState = {
@@ -540,7 +540,7 @@ const generateChatResponse = async (userMessage) => {
         const data = await response.json();
 
         if (data.answer) {
-            return removeMarkdown(data.answer);
+            return marked(data.answer);
         } else {
             return "I'm sorry, I didn't understand that. Can you please rephrase?";
         }
@@ -848,7 +848,6 @@ if ('serviceWorker' in navigator) {
 
 // Insight chat box handling function
 
-// Global IME Bank Analytics Chat Assistant - Function-based implementation
 let isTyping = false;
 let messageArea, chatInput, sendButton;
 
@@ -918,7 +917,7 @@ async function makeApiCall(userMessage) {
         
         // Add bot response
         if (data.message) {
-            const messageText = removeMarkdown(data.message);
+            const messageText = marked(data.message);
             addMessage(messageText, 'bot');
 
         } else {
@@ -975,7 +974,7 @@ function addMessage(text, sender) {
             ${avatarIcon}
         </div>
         <div class="banking-message-content">
-            <p>${escapeHtml(text)}</p>
+            <p>${text}</p>
             <span class="banking-message-time">${timeString}</span>
         </div>
     `;
@@ -1020,25 +1019,6 @@ function scrollToBottom() {
     setTimeout(function() {
         messageArea.scrollTop = messageArea.scrollHeight;
     }, 100);
-}
-
-// Utility function to escape HTML (security)
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// Optional: Add retry functionality
-function retryLastMessage() {
-    const userMessages = messageArea.querySelectorAll('.user-banking-message');
-    if (userMessages.length > 0) {
-        const lastUserMessage = userMessages[userMessages.length - 1];
-        const messageText = lastUserMessage.querySelector('.banking-message-content p').textContent;
-        
-        showTypingIndicator();
-        makeApiCall(messageText);
-    }
 }
 
 // Initialize when DOM is loaded
