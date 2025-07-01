@@ -485,15 +485,8 @@ def handle_followup_question(question, months_hist, actual_hist, future_months, 
         # Generate response using Gemini
         response = model_gemini.generate_content(prompt)
         
-        # Format the response
-        followup_response = []
-        followup_response.append("🤖 **Follow-up Analysis**")
-        followup_response.append("=" * 40)
-        followup_response.append(f"**Question**: {question}")
-        followup_response.append("=" * 40)
-        followup_response.append(response.text)
         
-        return "\n".join(followup_response)
+        return response.text.strip()
         
     except Exception as e:
         return f"Error processing follow-up question: {str(e)}"
