@@ -127,48 +127,33 @@ async function updateKPIValues() {
         const response = await fetch('http://localhost:8000/api/kpi'); 
         const data = await response.json();
 
-        const kpis = [
-            {
-                selector: '.kpi-card:nth-child(1)',
-                value: data.total_revenue,
-                change: data.total_revenue_change
-            },
-            {
-                selector: '.kpi-card:nth-child(2)',
-                value: data.active_branches,
-                change: data.active_branches_change
-            },
-            {
-                selector: '.kpi-card:nth-child(3)',
-                value: data.total_customers,
-                change: data.total_customers_change
-            },
-            {
-                selector: '.kpi-card:nth-child(4)',
-                value: data.growth_rate,
-                change: data.growth_rate_change
-            }
+        const kpiValues = [
+            { value: data.total_revenue, change: data.total_revenue_change },
+            { value: data.active_branches, change: data.active_branches_change },
+            { value: data.total_customers, change: data.total_customers_change },
+            { value: data.growth_rate, change: data.growth_rate_change }
         ];
 
-        kpis.forEach(kpi => {
-            const card = document.querySelector(kpi.selector);
-            if (card) {
-                const valueEl = card.querySelector('.kpi-value');
-                const changeEl = card.querySelector('.kpi-change');
-
-                if (valueEl) valueEl.textContent = kpi.value;
-                if (changeEl) changeEl.textContent = kpi.change;
-
-                if (changeEl && kpi.change.startsWith('-')) {
+        const kpiCards = document.querySelectorAll('.kpi-grid .kpi-card');
+        // console.log('kpiCards:', kpiCards);
+        // console.log('kpiValues:', kpiValues);
+        kpiCards.forEach((card, i) => {
+            const valueEl = card.querySelector('.kpi-value');
+            const changeEl = card.querySelector('.kpi-change');
+            // console.log(`Updating card #${i+1}:`, kpiValues[i]);
+            if (valueEl) valueEl.textContent = kpiValues[i].value;
+            if (changeEl) {
+                const changeStr = String(kpiValues[i].change);
+                changeEl.textContent = changeStr;
+                if (changeStr.startsWith('-')) {
                     changeEl.classList.remove('positive');
                     changeEl.classList.add('negative');
-                } else if (changeEl) {
+                } else {
                     changeEl.classList.remove('negative');
                     changeEl.classList.add('positive');
                 }
             }
         });
-
     } catch (error) {
         console.error('Error fetching KPI data:', error);
     }

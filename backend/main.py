@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import random
 import csv
+import pandas as pd
 
 app = FastAPI()
 
@@ -219,17 +220,78 @@ def chat_insights(qns: ChatInsightQuestion):
 
 @app.get("/api/kpi")
 def get_kpi_values():
-    # retrieve KPI values from the database or any other source
+    df = pd.read_csv("global_ime_combined.csv")
+    # Get all the follwing data from df
+    # 1. total_revenue
+    # 2. total_revenue_change
+    # 3. active_branches
+    # 4. active_branches_change
+    # 5. total_customers
+    # 6. total_customers_change
+    # 7. growth_rate
+    # 8. growth_rate_change
+    # print(df.columns.tolist())
+
+    # INSERT_YOUR_CODE
+
+    # Calculate KPIs from the dataframe
+    df_sorted = df.sort_values('month')
+    monthly_revenue = df_sorted.groupby('month')['total_revenue'].sum().sort_index()
+    # 1. Total Revenue (sum of 'total_revenue' column, in millions)
+    total_revenue = df['total_revenue'].sum()
+    total_revenue_m = total_revenue / 1_000_000
+    total_revenue_str = f"NPR {total_revenue_m:.1f}M"
+
+    # 3. Active Branches (unique branch_id in latest month)
+    latest_month = df_sorted['month'].max()
+    active_branches = df_sorted[df_sorted['month'] == latest_month]['branch_id'].nunique()
+    active_branches_str = str(active_branches)
+
+
+    # 5. Total Customers (sum of 'total_customers' in latest month, in millions)
+    total_customers = df_sorted[df_sorted['month'] == latest_month]['total_customers'].sum()
+    if total_customers >= 1_000_000:
+        total_customers_str = f"{total_customers/1_000_000:.1f}M"
+    else:
+        total_customers_str = f"{int(total_customers):,}"
+
+    
+    print(monthly_revenue)
+    # 7. Growth Rate (average revenue growth rate over all months)
+    if len(monthly_revenue) >= 2:
+        growth_rates = monthly_revenue.pct_change().dropna() * 100
+        avg_growth_rate = growth_rates.mean()
+        growth_rate_str = f"{avg_growth_rate:.1f}%"
+    else:
+        growth_rate_str = "N/A"
+
+
     data = {
-            "total_revenue": "NPR 45.2M",
-            "total_revenue_change": "+8.3%",
-            "active_branches": "125",
-            "active_branches_change": "+5",
-            "total_customers": "1.2M",
-            "total_customers_change": "+12.5%",
-            "growth_rate": "12.8%",
-            "growth_rate_change": "-2.1%"
-            }
+        "total_revenue": total_revenue_str,
+        "total_revenue_change": 0,
+        "active_branches": active_branches_str,
+        "active_branches_change": 0,
+        "total_customers": total_customers_str,
+        "total_customers_change": 0,
+        "growth_rate": growth_rate_str,
+        "growth_rate_change": 0
+    }
+
+    # retrieve KPI values from the database or any other source
+    # data = {
+    #         "total_revenue": "NPR 45.2M",
+    #         "total_revenue_change": "+8.3%",
+    #         "active_branches": "125",
+    #         "active_branches_change": "+5",
+    #         "total_customers": "1.2M",
+    #         "total_customers_change": "+12.5%",
+    #         "growth_rate": "12.8%",
+    #         "growth_rate_change": "-2.1%"
+    #         }
+
+
+
+
     try:
         return data
     except Exception as e:
