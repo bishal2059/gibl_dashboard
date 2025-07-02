@@ -595,18 +595,18 @@ function fetchInsightsData(branch_Id) {
 
 //populate insights data
 const populateInsightsData = (insights) => {
-        appData.summaryCards = insights["summary"];
-        appData.analysisCards = insights["analysis"];
-        appData.keyInsights = insights["insights_and_recommendations"];
-        appData.followUpQuestions = insights["suggested_follow_up_questions"];
- 
-
-        summaryCards();
-        loadAnalysisCards();
-        loadInsightCards();
-        loadFollowUpQuestions();
-        
-
+    if (!insights || Object.keys(insights).length === 0) {
+        document.getElementById('summaryGrid').innerHTML = `<div class="card" style="min-height:180px;display:flex;align-items:center;justify-content:center;"><div class="card__body"><div class="status status--info">No prediction data available. Please generate a prediction to view advanced insights.</div></div></div>`;
+        return;
+    }
+    appData.summaryCards = insights["summary"];
+    appData.analysisCards = insights["analysis"];
+    appData.keyInsights = insights["insights_and_recommendations"];
+    appData.followUpQuestions = insights["suggested_follow_up_questions"];
+    summaryCards();
+    loadAnalysisCards();
+    loadInsightCards();
+    loadFollowUpQuestions();
 }
 
 function summaryCards() {
@@ -863,8 +863,26 @@ const initializeApplication = () => {
     // Initialize chat system
     initializeChatSystem();
 
-    const chatBox = document.getElementById('chatAssistant');
-    chatBox.classList.add('hidden');
+    // Minimize banking assistant chat by default and show plus button
+    const chatContent = document.querySelector('#chatAssistant .chat-content');
+    const chatExpand = document.getElementById('chatExpand');
+    const chatMinimize = document.getElementById('chatMinimize');
+    if (chatContent) chatContent.classList.add('collapsed');
+    if (chatExpand) chatExpand.style.display = '';
+    if (chatMinimize) chatMinimize.style.display = 'none';
+    // Add expand/collapse logic
+    if (chatExpand && chatContent && chatMinimize) {
+        chatExpand.onclick = () => {
+            chatContent.classList.remove('collapsed');
+            chatExpand.style.display = 'none';
+            chatMinimize.style.display = '';
+        };
+        chatMinimize.onclick = () => {
+            chatContent.classList.add('collapsed');
+            chatExpand.style.display = '';
+            chatMinimize.style.display = 'none';
+        };
+    }
     
     // Start loading sequence
     startLoadingSequence();

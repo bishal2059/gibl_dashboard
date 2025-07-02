@@ -91,7 +91,7 @@
                             <i class="fas fa-user-circle"></i>
                             <span>Welcome, <span id="currentUser">Admin</span></span>
                         </div>
-                        <button id="logoutBtn" class="btn btn--outline btn--sm">
+                        <button id="logoutBtn" class="btn btn--outline btn--sm" style="color: #fff;" onmouseover="this.style.color='#000';" onmouseout="this.style.color='#fff';">
                             <i class="fas fa-sign-out-alt"></i> Logout
                         </button>
                     </div>
@@ -410,7 +410,7 @@
 
                     <!-- Summary Sub-tab -->
                      <div id="summarySubtab" class="subtab-content active">
-                        <h2>Summary of Data and Predictions</h2>
+                        <h2 style="margin-bottom: 24px;">Summary of Data and Predictions</h2>
                         <div class="summary-grid" id="summaryGrid">
                         </div>
                     </div>
@@ -542,7 +542,7 @@
     </div>
 
     <!-- Chat Assistant --> 
-    <div id="chatAssistant" class="chat-assistant">
+    <div id="chatAssistant" class="chat-assistant hidden">
         <div class="chat-header" id="chatHeader">
             <div class="chat-title">
                 <i class="fas fa-robot"></i>
@@ -551,6 +551,9 @@
             <div class="chat-controls">
                 <button class="chat-minimize" id="chatMinimize">
                     <i class="fas fa-minus"></i>
+                </button>
+                <button class="chat-expand" id="chatExpand" style="display: none;">
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>

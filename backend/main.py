@@ -220,7 +220,7 @@ def chat_insights(qns: ChatInsightQuestion):
 
 @app.get("/api/kpi")
 def get_kpi_values():
-    df = pd.read_csv("global_ime_combined.csv")
+    df_branches = pd.read_csv("./data/global_ime_enhanced_branch_data.csv")
     # Get all the follwing data from df
     # 1. total_revenue
     # 2. total_revenue_change
@@ -230,40 +230,38 @@ def get_kpi_values():
     # 6. total_customers_change
     # 7. growth_rate
     # 8. growth_rate_change
-    # print(df.columns.tolist())
+    print(df_branches.columns.tolist())
+    # Calculate total_revenue (sum of all branches)
+    total_revenue = df_branches['total_revenue'].sum()
+    # Format as NPR with M (millions) if appropriate
+    if total_revenue >= 1_000_000:
+        total_revenue_str = f"NPR {total_revenue/1_000_000:.1f}M"
+    elif total_revenue >= 1_000:
+        total_revenue_str = f"NPR {total_revenue/1_000:.1f}K"
+    else:
+        total_revenue_str = f"NPR {total_revenue:.0f}"
 
-    # INSERT_YOUR_CODE
-
-    # Calculate KPIs from the dataframe
-    df_sorted = df.sort_values('month')
-    monthly_revenue = df_sorted.groupby('month')['total_revenue'].sum().sort_index()
-    # 1. Total Revenue (sum of 'total_revenue' column, in millions)
-    total_revenue = df['total_revenue'].sum()
-    total_revenue_m = total_revenue / 1_000_000
-    total_revenue_str = f"NPR {total_revenue_m:.1f}M"
-
-    # 3. Active Branches (unique branch_id in latest month)
-    latest_month = df_sorted['month'].max()
-    active_branches = df_sorted[df_sorted['month'] == latest_month]['branch_id'].nunique()
+    # Active branches: count of unique branch_id
+    active_branches = df_branches['branch_id'].nunique()
     active_branches_str = str(active_branches)
 
-
-    # 5. Total Customers (sum of 'total_customers' in latest month, in millions)
-    total_customers = df_sorted[df_sorted['month'] == latest_month]['total_customers'].sum()
+    # Total customers: sum of total_customers
+    total_customers = df_branches['total_customers'].sum()
     if total_customers >= 1_000_000:
         total_customers_str = f"{total_customers/1_000_000:.1f}M"
+    elif total_customers >= 1_000:
+        total_customers_str = f"{total_customers/1_000:.1f}K"
     else:
-        total_customers_str = f"{int(total_customers):,}"
+        total_customers_str = str(int(total_customers))
 
-    
-    print(monthly_revenue)
-    # 7. Growth Rate (average revenue growth rate over all months)
-    if len(monthly_revenue) >= 2:
-        growth_rates = monthly_revenue.pct_change().dropna() * 100
-        avg_growth_rate = growth_rates.mean()
-        growth_rate_str = f"{avg_growth_rate:.1f}%"
+    # Growth rate: mean of growth_rate column (if exists)
+    if 'growth_rate' in df_branches.columns:
+        # If growth_rate is in percent, take mean and format
+        growth_rate = df_branches['growth_rate'].mean()
+        growth_rate_str = f"{growth_rate:.1f}%"
     else:
         growth_rate_str = "N/A"
+     
 
 
     data = {
@@ -273,7 +271,7 @@ def get_kpi_values():
         "active_branches_change": 0,
         "total_customers": total_customers_str,
         "total_customers_change": 0,
-        "growth_rate": growth_rate_str,
+        "growth_rate": 0,
         "growth_rate_change": 0
     }
 
